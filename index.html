@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진짜 나의 성장 패턴 찾기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* 인트로 */
+        .intro-screen h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .intro-screen .subtitle {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .highlight strong {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        /* 공통 게임 헤더 */
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .game-header .instruction {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .timer {
+            background: #667eea;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        /* 게임 1: 집중력 테스트 */
+        .focus-game {
+            text-align: center;
+        }
+
+        .task-choice {
+            display: flex;
+            gap: 20px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+
+        .task-card {
+            flex: 1;
+            max-width: 300px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 16px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .task-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+
+        .task-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .task-card p {
+            color: #666;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+
+        .task-progress {
+            margin: 30px 0;
+        }
+
+        .task-progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .task-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .click-area {
+            background: #667eea;
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s;
+        }
+
+        .click-area:active {
+            transform: scale(0.95);
+        }
+
+        /* 게임 2: 우선순위 게임 */
+        .priority-game {
+            text-align: center;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+            min-height: 400px;
+        }
+
+        .priority-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 3px solid #e0e0e0;
+            cursor: move;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .priority-card:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .priority-card.dragging {
+            opacity: 0.5;
+        }
+
+        .time-pressure {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 게임 3: 2주 시뮬레이션 */
+        .simulation-game {
+            text-align: center;
+        }
+
+        .day-indicator {
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .situation {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .situation h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .situation p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 3px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 1.05em;
+        }
+
+        .choice-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .reaction-timer {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        /* 설문 화면 */
+        .survey-screen .question-text {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .survey-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .survey-option {
+            background: #f8f9fa;
+            border: 3px solid transparent;
+            padding: 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .survey-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .progress-indicator {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* 결과 화면 */
+        .result-screen h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .gap-analysis {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin: 30px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .gap-analysis h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .gap-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .gap-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .comparison-item {
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .comparison-item.perception {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .comparison-item.behavior {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .comparison-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .comparison-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .insight {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .insight h4 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateX(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 25px;
+            }
+            
+            .task-choice {
+                flex-direction: column;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 인트로 화면 -->
+        <div class="screen active" id="introScreen">
+            <div class="card intro-screen">
+                <h1>🎮 진짜 나의 성장 패턴 찾기</h1>
+                <p class="subtitle">
+                    생각하는 나 vs 행동하는 나<br>
+                    실제 게임 플레이로 진짜 성향을 발견하세요
+                </p>
+                
+                <div class="highlight">
+                    <strong>💡 왜 게임인가?</strong>
+                    <p style="margin-top: 10px; color: #666;">
+                        "나는 계획적이야" 라고 생각하지만, 실제로는 즉흥적으로 행동할 수 있습니다.<br>
+                        게임 속 실시간 선택과 반응으로 <strong style="color: #667eea;">진짜 나</strong>를 측정합니다.
+                    </p>
+                </div>
+
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <strong>집중력 게임</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">2분</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <strong>간단 설문</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">2분</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <strong>우선순위 게임</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">3분</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <strong>간단 설문</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">2분</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <strong>2주 시뮬레이션</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">5분</p>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startJourney()">시작하기 →</button>
+            </div>
+        </div>
+
+        <!-- 게임 1: 집중력 테스트 -->
+        <div class="screen" id="game1Screen">
+            <div class="card focus-game">
+                <button class="back-btn" onclick="showScreen('introScreen')">← 뒤로</button>
+                <div class="game-header">
+                    <h2>🎯 게임 1: 집중력 측정</h2>
+                    <p class="instruction">
+                        두 가지 작업 중 하나를 선택하세요.<br>
+                        선택한 작업을 30초간 수행합니다.
+                    </p>
+                </div>
+
+                <div id="taskSelection">
+                    <div class="task-choice">
+                        <div class="task-card" onclick="selectTask('simple')">
+                            <h3>🔄 단순 작업</h3>
+                            <p>같은 버튼을<br>반복해서 클릭하기</p>
+                        </div>
+                        <div class="task-card" onclick="selectTask('complex')">
+                            <h3>🧩 복잡 작업</h3>
+                            <p>다양한 패턴을<br>빠르게 처리하기</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="taskExecution" style="display: none;">
+                    <div class="timer" id="game1Timer">30</div>
+                    <div class="task-progress">
+                        <p style="font-size: 1.3em; color: #333; margin-bottom: 10px;">
+                            점수: <strong id="taskScore" style="color: #667eea;">0</strong>
+                        </p>
+                        <div class="task-progress-bar">
+                            <div class="task-progress-fill" id="taskProgressFill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="click-area" id="clickArea">
+                        클릭하세요!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 설문 1 -->
+        <div class="screen" id="survey1Screen">
+            <div class="card survey-screen">
+                <div class="progress-indicator" id="survey1Progress"></div>
+                <div class="question-text" id="survey1Question"></div>
+                <div class="survey-options" id="survey1Options"></div>
+            </div>
+        </div>
+
+        <!-- 게임 2: 우선순위 게임 -->
+        <div class="screen" id="game2Screen">
+            <div class="card priority-game">
+                <div class="game-header">
+                    <h2>⚡ 게임 2: 압박 상황 우선순위</h2>
+                    <p class="instruction">
+                        갑자기 일정이 꼬였습니다!<br>
+                        카드를 드래그해서 <strong>진짜 우선순위</strong> 순서로 배치하세요.
+                    </p>
+                </div>
+
+                <div class="time-pressure" id="pressureText">
+                    ⏰ 시간 압박: 30초 내에 정리해야 합니다!
+                </div>
+
+                <div class="timer" id="game2Timer">30</div>
+
+                <div class="cards-container" id="priorityCards"></div>
+            </div>
+        </div>
+
+        <!-- 설문 2 -->
+        <div class="screen" id="survey2Screen">
+            <div class="card survey-screen">
+                <div class="progress-indicator" id="survey2Progress"></div>
+                <div class="question-text" id="survey2Question"></div>
+                <div class="survey-options" id="survey2Options"></div>
+            </div>
+        </div>
+
+        <!-- 게임 3: 2주 시뮬레이션 -->
+        <div class="screen" id="game3Screen">
+            <div class="card simulation-game">
+                <div class="game-header">
+                    <h2>📅 게임 3: 2주 시뮬레이션</h2>
+                    <p class="instruction">
+                        가상의 2주를 살아보세요.<br>
+                        매일 상황이 발생하면 <strong>직관적으로</strong> 선택하세요.
+                    </p>
+                </div>
+
+                <div class="day-indicator" id="dayIndicator"></div>
+                <div class="reaction-timer" id="reactionTimer"></div>
+
+                <div class="situation" id="situationContainer"></div>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div class="screen" id="resultScreen">
+            <div class="card result-screen">
+                <h2>🎯 당신의 진짜 성장 패턴</h2>
+
+                <div class="gap-analysis">
+                    <h3>💭 생각하는 나 vs 🎮 행동하는 나</h3>
+                    <div id="gapAnalysisContent"></div>
+                </div>
+
+                <div id="personalityResult"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="downloadImage()">이미지 다운로드</button>
+                    <button class="btn btn-secondary" onclick="location.reload()">다시 하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 데이터
+        const gameData = {
+            game1: { taskType: '', score: 0, startTime: 0, consistency: [] },
+            survey1: [],
+            game2: { priorities: [], changes: 0, timeSpent: 0 },
+            survey2: [],
+            game3: { days: [], avgReactionTime: 0, patterns: {} }
+        };
+
+        let currentSurvey1 = 0;
+        let currentSurvey2 = 0;
+        let currentDay = 0;
+
+        // 설문 데이터
+        const survey1Questions = [
+            {
+                text: '계획을 세울 때 나는...',
+                options: [
+                    { text: '세부적으로 모든 것을 계획한다', value: 'detail' },
+                    { text: '큰 그림만 그리고 유연하게 조정한다', value: 'flexible' }
+                ]
+            },
+            {
+                text: '새로운 일을 시작할 때...',
+                options: [
+                    { text: '충분히 준비한 후 시작한다', value: 'prepared' },
+                    { text: '일단 시작하고 배워간다', value: 'action' }
+                ]
+            },
+            {
+                text: '집중력이 떨어질 때 나는...',
+                options: [
+                    { text: '휴식을 취한 후 다시 시작한다', value: 'rest' },
+                    { text: '억지로라도 계속 진행한다', value: 'push' }
+                ]
+            },
+            {
+                text: '목표 달성 방식은...',
+                options: [
+                    { text: '꾸준히 조금씩 쌓아간다', value: 'steady' },
+                    { text: '단기간에 집중해서 끝낸다', value: 'sprint' }
+                ]
+            },
+            {
+                text: '실패했을 때 나는...',
+                options: [
+                    { text: '원인을 분석하고 전략을 수정한다', value: 'analyze' },
+                    { text: '빠르게 다시 도전한다', value: 'retry' }
+                ]
+            }
+        ];
+
+        const survey2Questions = [
+            {
+                text: '협업할 때 선호하는 방식은...',
+                options: [
+                    { text: '역할을 명확히 나누고 진행한다', value: 'structured' },
+                    { text: '유기적으로 협력하며 진행한다', value: 'organic' }
+                ]
+            },
+            {
+                text: '피드백을 받을 때...',
+                options: [
+                    { text: '구체적이고 명확한 피드백을 선호한다', value: 'specific' },
+                    { text: '전반적인 방향성 피드백을 선호한다', value: 'general' }
+                ]
+            },
+            {
+                text: '압박 상황에서 나는...',
+                options: [
+                    { text: '오히려 집중력이 높아진다', value: 'thrive' },
+                    { text: '평소보다 실수가 늘어난다', value: 'stress' }
+                ]
+            },
+            {
+                text: '학습할 때 선호하는 방식은...',
+                options: [
+                    { text: '체계적인 커리큘럼을 따라간다', value: 'curriculum' },
+                    { text: '관심 가는 것을 자유롭게 탐구한다', value: 'explore' }
+                ]
+            },
+            {
+                text: '장기 프로젝트를 할 때...',
+                options: [
+                    { text: '일정을 만들고 철저히 관리한다', value: 'schedule' },
+                    { text: '큰 흐름만 정하고 유연하게 조정한다', value: 'adaptive' }
+                ]
+            }
+        ];
+
+        // 2주 시뮬레이션 시나리오
+        const simulationScenarios = [
+            {
+                day: 1,
+                situation: '첫날! 2주 프로젝트가 시작되었습니다.',
+                question: '어떻게 시작하시겠습니까?',
+                choices: [
+                    { text: '전체 계획부터 세밀하게 세운다', type: 'planner' },
+                    { text: '일단 시작하면서 방향을 잡는다', type: 'starter' }
+                ]
+            },
+            {
+                day: 3,
+                situation: '예상보다 진행이 느립니다. 계획의 30%만 완료했습니다.',
+                question: '어떻게 하시겠습니까?',
+                choices: [
+                    { text: '계획을 전면 재검토하고 수정한다', type: 'adaptive' },
+                    { text: '속도를 올려 계획대로 만회한다', type: 'pusher' }
+                ]
+            },
+            {
+                day: 5,
+                situation: '갑자기 더 흥미로운 아이디어가 떠올랐습니다.',
+                question: '어떻게 하시겠습니까?',
+                choices: [
+                    { text: '새 아이디어를 시도해본다', type: 'explorer' },
+                    { text: '원래 계획을 지속한다', type: 'focused' }
+                ]
+            },
+            {
+                day: 7,
+                situation: '일주일이 지났습니다. 중간 점검 시간입니다.',
+                question: '무엇을 하시겠습니까?',
+                choices: [
+                    { text: '세부 데이터를 분석하고 보고서 작성', type: 'analyzer' },
+                    { text: '전체적인 느낌만 체크하고 바로 진행', type: 'intuitive' }
+                ]
+            },
+            {
+                day: 9,
+                situation: '집중력이 많이 떨어집니다.',
+                question: '어떻게 하시겠습니까?',
+                choices: [
+                    { text: '휴식을 취하고 리프레시한다', type: 'rest' },
+                    { text: '억지로라도 계속 밀고 나간다', type: 'grit' }
+                ]
+            },
+            {
+                day: 11,
+                situation: '예상치 못한 문제가 발생했습니다!',
+                question: '어떻게 대응하시겠습니까?',
+                choices: [
+                    { text: '원인을 파악하고 체계적으로 해결', type: 'systematic' },
+                    { text: '빠르게 우회 방법을 찾는다', type: 'agile' }
+                ]
+            },
+            {
+                day: 13,
+                situation: '마감이 하루 앞으로 다가왔습니다.',
+                question: '마무리 전략은?',
+                choices: [
+                    { text: '완성도를 높이는 데 집중한다', type: 'quality' },
+                    { text: '핵심만 빠르게 마무리한다', type: 'speed' }
+                ]
+            },
+            {
+                day: 14,
+                situation: '마지막 날! 프로젝트를 완료했습니다.',
+                question: '다음에는 무엇을 하시겠습니까?',
+                choices: [
+                    { text: '회고하고 배운 점을 정리한다', type: 'reflective' },
+                    { text: '바로 다음 프로젝트를 시작한다', type: 'momentum' }
+                ]
+            }
+        ];
+
+        // 화면 전환
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // 여정 시작
+        function startJourney() {
+            showScreen('game1Screen');
+        }
+
+        // 게임 1: 작업 선택
+        function selectTask(taskType) {
+            gameData.game1.taskType = taskType;
+            gameData.game1.startTime = Date.now();
+            
+            document.getElementById('taskSelection').style.display = 'none';
+            document.getElementById('taskExecution').style.display = 'block';
+            
+            if (taskType === 'simple') {
+                startSimpleTask();
+            } else {
+                startComplexTask();
+            }
+        }
+
+        // 단순 작업
+        function startSimpleTask() {
+            let timeLeft = 30;
+            let score = 0;
+            const clickTimes = [];
+            
+            const clickArea = document.getElementById('clickArea');
+            clickArea.onclick = function() {
+                score++;
+                clickTimes.push(Date.now());
+                document.getElementById('taskScore').textContent = score;
+                
+                const progress = Math.min((score / 50) * 100, 100);
+                document.getElementById('taskProgressFill').style.width = progress + '%';
+            };
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game1Timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    clickArea.onclick = null;
+                    gameData.game1.score = score;
+                    gameData.game1.consistency = clickTimes;
+                    setTimeout(() => startSurvey1(), 1000);
+                }
+            }, 1000);
+        }
+
+        // 복잡 작업
+        function startComplexTask() {
+            let timeLeft = 30;
+            let score = 0;
+            const patterns = [
+                { emoji: '🔴', color: '#ff6b6b', name: '빨강' },
+                { emoji: '🔵', color: '#4dabf7', name: '파랑' },
+                { emoji: '🟢', color: '#51cf66', name: '초록' },
+                { emoji: '🟡', color: '#ffd43b', name: '노랑' }
+            ];
+            
+            const operations = ['같은 것', '다른 것', '더 밝은 것', '더 어두운 것'];
+            let currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            let currentOperation = operations[Math.floor(Math.random() * operations.length)];
+            const clickTimes = [];
+            
+            const clickArea = document.getElementById('clickArea');
+            clickArea.innerHTML = `
+                <div style="font-size: 2em; margin-bottom: 20px;">${currentPattern.emoji}</div>
+                <div style="font-size: 1.3em;">${currentOperation}을 클릭!</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    ${patterns.map((p, idx) => `
+                        <button 
+                            id="option-${idx}"
+                            style="padding: 30px; font-size: 2em; border: 3px solid white; border-radius: 12px; cursor: pointer; background: ${p.color}; transition: all 0.2s;"
+                            onmouseover="this.style.transform='scale(1.1)'"
+                            onmouseout="this.style.transform='scale(1)'"
+                            onclick="checkComplexAnswer(${idx})"
+                        >
+                            ${p.emoji}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game1Timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    gameData.game1.score = score;
+                    gameData.game1.consistency = clickTimes;
+                    setTimeout(() => startSurvey1(), 1000);
+                }
+            }, 1000);
+            
+            window.checkComplexAnswer = function(selectedIdx) {
+                let isCorrect = false;
+                const selected = patterns[selectedIdx];
+                
+                // 정답 판정
+                if (currentOperation === '같은 것' && selected.emoji === currentPattern.emoji) {
+                    isCorrect = true;
+                } else if (currentOperation === '다른 것' && selected.emoji !== currentPattern.emoji) {
+                    isCorrect = true;
+                } else if (currentOperation === '더 밝은 것') {
+                    const brightness = { '🟡': 4, '🟢': 3, '🔵': 2, '🔴': 1 };
+                    if (brightness[selected.emoji] > brightness[currentPattern.emoji]) {
+                        isCorrect = true;
+                    }
+                } else if (currentOperation === '더 어두운 것') {
+                    const brightness = { '🟡': 4, '🟢': 3, '🔵': 2, '🔴': 1 };
+                    if (brightness[selected.emoji] < brightness[currentPattern.emoji]) {
+                        isCorrect = true;
+                    }
+                }
+                
+                if (isCorrect) {
+                    score++;
+                    clickTimes.push(Date.now());
+                    document.getElementById('taskScore').textContent = score;
+                    
+                    // 피드백
+                    const btn = document.getElementById(`option-${selectedIdx}`);
+                    btn.style.border = '5px solid #51cf66';
+                    setTimeout(() => {
+                        btn.style.border = '3px solid white';
+                    }, 200);
+                    
+                    // 새 문제
+                    currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
+                    currentOperation = operations[Math.floor(Math.random() * operations.length)];
+                    
+                    clickArea.querySelector('div:first-child').innerHTML = currentPattern.emoji;
+                    clickArea.querySelector('div:nth-child(2)').innerHTML = `${currentOperation}을 클릭!`;
+                    
+                    const progress = Math.min((score / 20) * 100, 100);
+                    document.getElementById('taskProgressFill').style.width = progress + '%';
+                } else {
+                    // 오답 피드백
+                    const btn = document.getElementById(`option-${selectedIdx}`);
+                    btn.style.border = '5px solid #ff6b6b';
+                    setTimeout(() => {
+                        btn.style.border = '3px solid white';
+                    }, 200);
+                }
+            };
+        }
+
+        // 설문 1 시작
+        function startSurvey1() {
+            currentSurvey1 = 0;
+            showScreen('survey1Screen');
+            showSurvey1Question();
+        }
+
+        function showSurvey1Question() {
+            const q = survey1Questions[currentSurvey1];
+            document.getElementById('survey1Progress').textContent = 
+                `설문 ${currentSurvey1 + 1} / ${survey1Questions.length}`;
+            document.getElementById('survey1Question').textContent = q.text;
+            
+            const optionsHtml = q.options.map((opt, idx) => `
+                <div class="survey-option" onclick="answerSurvey1(${idx})">
+                    ${opt.text}
+                </div>
+            `).join('');
+            
+            document.getElementById('survey1Options').innerHTML = optionsHtml;
+        }
+
+        function answerSurvey1(optionIndex) {
+            const q = survey1Questions[currentSurvey1];
+            gameData.survey1.push({
+                question: q.text,
+                answer: q.options[optionIndex].value
+            });
+            
+            currentSurvey1++;
+            if (currentSurvey1 < survey1Questions.length) {
+                setTimeout(() => showSurvey1Question(), 300);
+            } else {
+                setTimeout(() => startGame2(), 500);
+            }
+        }
+
+        // 게임 2: 우선순위
+        function startGame2() {
+            showScreen('game2Screen');
+            
+            const tasks = [
+                '🎯 핵심 업무 완료',
+                '📧 긴급 이메일 답장',
+                '📊 보고서 작성',
+                '☕ 팀 미팅 참석',
+                '📚 학습 및 성장',
+                '🏃 운동 및 건강',
+                '👥 인간관계 관리',
+                '🎨 취미 활동'
+            ];
+            
+            const shuffled = tasks.sort(() => Math.random() - 0.5);
+            
+            const cardsHtml = shuffled.map((task, idx) => `
+                <div class="priority-card" draggable="true" data-index="${idx}" data-task="${task}">
+                    ${task}
+                </div>
+            `).join('');
+            
+            document.getElementById('priorityCards').innerHTML = cardsHtml;
+            
+            // 드래그 앤 드롭
+            setupDragAndDrop();
+            
+            // 타이머
+            let timeLeft = 30;
+            const startTime = Date.now();
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game2Timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    gameData.game2.timeSpent = Date.now() - startTime;
+                    // 자동으로 제출
+                    submitPriorities();
+                }
+            }, 1000);
+        }
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.priority-card');
+            let draggedElement = null;
+            
+            cards.forEach(card => {
+                card.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.classList.add('dragging');
+                    gameData.game2.changes++;
+                });
+                
+                card.addEventListener('dragend', function(e) {
+                    this.classList.remove('dragging');
+                });
+                
+                card.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+                
+                card.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (draggedElement !== this) {
+                        const allCards = [...document.querySelectorAll('.priority-card')];
+                        const draggedIndex = allCards.indexOf(draggedElement);
+                        const targetIndex = allCards.indexOf(this);
+                        
+                        if (draggedIndex < targetIndex) {
+                            this.parentNode.insertBefore(draggedElement, this.nextSibling);
+                        } else {
+                            this.parentNode.insertBefore(draggedElement, this);
+                        }
+                    }
+                });
+            });
+        }
+
+        function submitPriorities() {
+            const cards = document.querySelectorAll('.priority-card');
+            gameData.game2.priorities = Array.from(cards).map(card => card.dataset.task);
+            
+            setTimeout(() => startSurvey2(), 500);
+        }
+
+        // 설문 2
+        function startSurvey2() {
+            currentSurvey2 = 0;
+            showScreen('survey2Screen');
+            showSurvey2Question();
+        }
+
+        function showSurvey2Question() {
+            const q = survey2Questions[currentSurvey2];
+            document.getElementById('survey2Progress').textContent = 
+                `설문 ${currentSurvey2 + 1} / ${survey2Questions.length}`;
+            document.getElementById('survey2Question').textContent = q.text;
+            
+            const optionsHtml = q.options.map((opt, idx) => `
+                <div class="survey-option" onclick="answerSurvey2(${idx})">
+                    ${opt.text}
+                </div>
+            `).join('');
+            
+            document.getElementById('survey2Options').innerHTML = optionsHtml;
+        }
+
+        function answerSurvey2(optionIndex) {
+            const q = survey2Questions[currentSurvey2];
+            gameData.survey2.push({
+                question: q.text,
+                answer: q.options[optionIndex].value
+            });
+            
+            currentSurvey2++;
+            if (currentSurvey2 < survey2Questions.length) {
+                setTimeout(() => showSurvey2Question(), 300);
+            } else {
+                setTimeout(() => startGame3(), 500);
+            }
+        }
+
+        // 게임 3: 2주 시뮬레이션
+        function startGame3() {
+            currentDay = 0;
+            showScreen('game3Screen');
+            showDay();
+        }
+
+        function showDay() {
+            if (currentDay >= simulationScenarios.length) {
+                calculateResults();
+                return;
+            }
+            
+            const scenario = simulationScenarios[currentDay];
+            const reactionStart = Date.now();
+            
+            document.getElementById('dayIndicator').textContent = `📅 Day ${scenario.day}`;
+            
+            let reactionTime = 0;
+            const reactionTimer = setInterval(() => {
+                reactionTime = ((Date.now() - reactionStart) / 1000).toFixed(1);
+                document.getElementById('reactionTimer').textContent = `⏱️ 반응 시간: ${reactionTime}초`;
+            }, 100);
+            
+            const situationHtml = `
+                <h3>${scenario.situation}</h3>
+                <p>${scenario.question}</p>
+                <div class="choices">
+                    ${scenario.choices.map((choice, idx) => `
+                        <button class="choice-btn" onclick="selectChoice(${idx}, ${reactionStart})">
+                            ${choice.text}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('situationContainer').innerHTML = situationHtml;
+        }
+
+        function selectChoice(choiceIndex, reactionStart) {
+            const scenario = simulationScenarios[currentDay];
+            const reactionTime = Date.now() - reactionStart;
+            
+            gameData.game3.days.push({
+                day: scenario.day,
+                choice: scenario.choices[choiceIndex].type,
+                reactionTime: reactionTime
+            });
+            
+            currentDay++;
+            setTimeout(() => showDay(), 500);
+        }
+
+        // 결과 계산 및 표시
+        function calculateResults() {
+            // 게임 데이터 분석
+            const behaviorProfile = analyzeBehavior();
+            const perceptionProfile = analyzeSurveys();
+            const gaps = findGaps(behaviorProfile, perceptionProfile);
+            
+            showResults(behaviorProfile, perceptionProfile, gaps);
+        }
+
+        function analyzeBehavior() {
+            const profile = {
+                focusType: gameData.game1.taskType,
+                focusScore: gameData.game1.score,
+                priorityStyle: '',
+                decisionSpeed: 0,
+                consistency: ''
+            };
+            
+            // 우선순위 스타일
+            const topPriorities = gameData.game2.priorities.slice(0, 3);
+            if (topPriorities.some(p => p.includes('핵심') || p.includes('보고서'))) {
+                profile.priorityStyle = '업무 중심';
+            } else if (topPriorities.some(p => p.includes('학습') || p.includes('성장'))) {
+                profile.priorityStyle = '성장 중심';
+            } else {
+                profile.priorityStyle = '균형 추구';
+            }
+            
+            // 결정 속도
+            const avgReaction = gameData.game3.days.reduce((sum, d) => sum + d.reactionTime, 0) / gameData.game3.days.length;
+            profile.decisionSpeed = avgReaction < 3000 ? '빠름' : avgReaction < 6000 ? '보통' : '신중함';
+            
+            // 일관성
+            const types = gameData.game3.days.map(d => d.choice);
+            const unique = [...new Set(types)];
+            profile.consistency = unique.length < 4 ? '일관적' : '유연함';
+            
+            return profile;
+        }
+
+        function analyzeSurveys() {
+            const profile = {
+                planningStyle: '',
+                approachStyle: '',
+                pressureResponse: '',
+                learningStyle: ''
+            };
+            
+            // 설문 데이터 분석
+            const s1 = gameData.survey1;
+            const s2 = gameData.survey2;
+            
+            profile.planningStyle = s1.find(a => a.answer === 'detail') ? '세밀한 계획' : '유연한 계획';
+            profile.approachStyle = s1.find(a => a.answer === 'prepared') ? '준비형' : '실행형';
+            profile.pressureResponse = s2.find(a => a.answer === 'thrive') ? '압박 강화' : '압박 약화';
+            profile.learningStyle = s2.find(a => a.answer === 'curriculum') ? '체계적' : '탐험적';
+            
+            return profile;
+        }
+
+        function findGaps(behavior, perception) {
+            const gaps = [];
+            
+            // 계획 vs 실행
+            if (perception.planningStyle === '세밀한 계획' && behavior.decisionSpeed === '빠름') {
+                gaps.push({
+                    area: '계획 vs 실행',
+                    perception: '세밀하게 계획한다고 생각함',
+                    behavior: '실제로는 빠르게 직관적으로 결정함',
+                    insight: '계획보다는 즉각적인 판단력이 강점입니다. 완벽한 계획보다 빠른 실행과 조정이 더 효과적일 수 있습니다.'
+                });
+            }
+            
+            // 집중 스타일
+            if (perception.approachStyle === '준비형' && behavior.focusType === 'simple') {
+                gaps.push({
+                    area: '학습 스타일',
+                    perception: '충분히 준비하는 스타일이라고 생각함',
+                    behavior: '실제로는 단순하고 반복적인 작업에서 집중도가 높음',
+                    insight: '복잡한 준비보다는 작은 단위로 쪼개서 반복 실행하는 방식이 더 효과적입니다.'
+                });
+            }
+            
+            // 일관성
+            if (perception.learningStyle === '체계적' && behavior.consistency === '유연함') {
+                gaps.push({
+                    area: '실행 일관성',
+                    perception: '체계적으로 학습한다고 생각함',
+                    behavior: '실제로는 상황에 따라 유연하게 대응함',
+                    insight: '고정된 체계보다는 상황별로 최적의 방법을 선택하는 능력이 강점입니다.'
+                });
+            }
+            
+            // 기본 갭이 없으면
+            if (gaps.length === 0) {
+                gaps.push({
+                    area: '자기 인식',
+                    perception: '생각하는 대로',
+                    behavior: '행동하는',
+                    insight: '당신은 자기 인식과 실제 행동이 일치하는 편입니다. 이는 자기 이해도가 높다는 의미이며, 이를 바탕으로 더 효과적인 성장 전략을 세울 수 있습니다.'
+                });
+            }
+            
+            return gaps;
+        }
+
+        function showResults(behavior, perception, gaps) {
+            // 갭 분석
+            const gapHtml = gaps.map(gap => `
+                <div class="gap-item">
+                    <h4>${gap.area}</h4>
+                    <div class="comparison">
+                        <div class="comparison-item perception">
+                            <div class="comparison-label">💭 생각하는 나</div>
+                            <div class="comparison-value">${gap.perception}</div>
+                        </div>
+                        <div class="comparison-item behavior">
+                            <div class="comparison-label">🎮 행동하는 나</div>
+                            <div class="comparison-value">${gap.behavior}</div>
+                        </div>
+                    </div>
+                    <div class="insight">
+                        <h4>💡 인사이트</h4>
+                        <p>${gap.insight}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('gapAnalysisContent').innerHTML = gapHtml;
+            
+            // 행동 기반 프로필
+            const profileHtml = `
+                <div class="result-section" style="background: #f8f9fa; padding: 30px; border-radius: 16px; margin-top: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">🎯 당신의 실제 성장 패턴</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div style="background: white; padding: 20px; border-radius: 12px;">
+                            <strong style="color: #667eea;">집중 스타일</strong>
+                            <p style="margin-top: 10px; color: #333; font-size: 1.1em;">${behavior.focusType === 'simple' ? '단순 반복 강화형' : '복잡 도전 선호형'}</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 12px;">
+                            <strong style="color: #667eea;">우선순위</strong>
+                            <p style="margin-top: 10px; color: #333; font-size: 1.1em;">${behavior.priorityStyle}</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 12px;">
+                            <strong style="color: #667eea;">결정 속도</strong>
+                            <p style="margin-top: 10px; color: #333; font-size: 1.1em;">${behavior.decisionSpeed}</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 12px;">
+                            <strong style="color: #667eea;">실행 일관성</strong>
+                            <p style="margin-top: 10px; color: #333; font-size: 1.1em;">${behavior.consistency}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 30px; border-radius: 16px; margin-top: 20px; border-left: 5px solid #667eea;">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">🚀 맞춤 성장 전략</h3>
+                    ${generateStrategy(behavior)}
+                </div>
+            `;
+            
+            document.getElementById('personalityResult').innerHTML = profileHtml;
+            
+            showScreen('resultScreen');
+        }
+
+        function generateStrategy(behavior) {
+            let strategy = '';
+            
+            if (behavior.focusType === 'simple' && behavior.decisionSpeed === '빠름') {
+                strategy = `
+                    <p style="font-size: 1.1em; line-height: 1.8; color: #333;">
+                        <strong>당신의 강점:</strong> 빠른 실행력과 단순 작업에서의 높은 집중도<br><br>
+                        <strong>최적 학습 방식:</strong><br>
+                        • 복잡한 목표를 작은 단위로 쪼개기<br>
+                        • 25분 집중 + 5분 휴식 (포모도로)<br>
+                        • 매일 체크리스트로 성취감 쌓기<br><br>
+                        <strong>주의할 점:</strong> 지루함이 빨리 올 수 있으니 2-3일마다 방식을 살짝 변형하세요.
+                    </p>
+                `;
+            } else if (behavior.focusType === 'complex' && behavior.consistency === '유연함') {
+                strategy = `
+                    <p style="font-size: 1.1em; line-height: 1.8; color: #333;">
+                        <strong>당신의 강점:</strong> 복잡한 문제 해결과 상황별 유연한 대응<br><br>
+                        <strong>최적 학습 방식:</strong><br>
+                        • 다양한 관점에서 접근하는 프로젝트<br>
+                        • 주제를 자유롭게 탐험하는 학습<br>
+                        • 창의적 문제 해결 중심 활동<br><br>
+                        <strong>주의할 점:</strong> 완주율이 낮을 수 있으니 핵심 1개 + 탐험 2개 구조로 가세요.
+                    </p>
+                `;
+            } else {
+                strategy = `
+                    <p style="font-size: 1.1em; line-height: 1.8; color: #333;">
+                        <strong>당신의 강점:</strong> 균형잡힌 접근과 상황 판단력<br><br>
+                        <strong>최적 학습 방식:</strong><br>
+                        • 루틴과 변화를 적절히 섞기<br>
+                        • 주 단위 계획 + 일 단위 유연성<br>
+                        • 다양한 학습 방법 시도<br><br>
+                        <strong>주의할 점:</strong> 너무 중도적이면 특색이 없을 수 있으니 한 가지는 깊게 파세요.
+                    </p>
+                `;
+            }
+            
+            return strategy;
+        }
+
+        function downloadImage() {
+            alert('이미지 다운로드 기능은 다음 버전에서 제공됩니다!');
+        }
+    </script>
+</body>
+</html>
