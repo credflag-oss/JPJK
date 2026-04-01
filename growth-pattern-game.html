@@ -200,6 +200,52 @@
             margin: 30px 0;
         }
 
+        .circular-progress {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .circle-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .circle-segment {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .circle-segment.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .circle-segment.failed {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .fail-counter {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+            color: #ff6b6b;
+        }
+
         .task-progress-bar {
             height: 20px;
             background: #e0e0e0;
@@ -265,6 +311,28 @@
 
         .priority-card.dragging {
             opacity: 0.5;
+        }
+
+        .priority-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            position: relative;
+        }
+
+        .priority-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
         }
 
         .time-pressure {
@@ -626,8 +694,16 @@
                         <p style="font-size: 1.3em; color: #333; margin-bottom: 10px;">
                             점수: <strong id="taskScore" style="color: #667eea;">0</strong>
                         </p>
-                        <div class="task-progress-bar">
-                            <div class="task-progress-fill" id="taskProgressFill" style="width: 0%"></div>
+                        <div id="simpleProgress" style="display: none;">
+                            <div class="fail-counter">
+                                실패: <strong id="failCount">0</strong>번
+                            </div>
+                            <div class="circle-container" id="circleContainer"></div>
+                        </div>
+                        <div id="complexProgress" style="display: none;">
+                            <div class="task-progress-bar">
+                                <div class="task-progress-fill" id="taskProgressFill" style="width: 0%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="click-area" id="clickArea">
@@ -653,7 +729,8 @@
                     <h2>⚡ 게임 2: 압박 상황 우선순위</h2>
                     <p class="instruction">
                         갑자기 일정이 꼬였습니다!<br>
-                        카드를 드래그해서 <strong>진짜 우선순위</strong> 순서로 배치하세요.
+                        <strong>클릭한 순서대로</strong> 우선순위가 매겨집니다.<br>
+                        (다시 클릭하면 선택 해제)
                     </p>
                 </div>
 
@@ -717,7 +794,7 @@
     <script>
         // 전역 데이터
         const gameData = {
-            game1: { taskType: '', score: 0, startTime: 0, consistency: [] },
+            game1: { taskType: '', score: 0, fails: 0, startTime: 0, consistency: [] },
             survey1: [],
             game2: { priorities: [], changes: 0, timeSpent: 0 },
             survey2: [],
@@ -907,20 +984,85 @@
             }
         }
 
-        // 단순 작업
+        // 단순 작업 - 1초 리듬 게임
         function startSimpleTask() {
             let timeLeft = 30;
             let score = 0;
+            let fails = 0;
+            let currentSegment = 0;
+            let canClick = false;
+            const totalSegments = 30;
             const clickTimes = [];
             
+            // 원형 진행 표시 생성
+            document.getElementById('simpleProgress').style.display = 'block';
+            const circleContainer = document.getElementById('circleContainer');
+            circleContainer.innerHTML = '';
+            for (let i = 0; i < totalSegments; i++) {
+                const segment = document.createElement('div');
+                segment.className = 'circle-segment';
+                segment.id = `segment-${i}`;
+                circleContainer.appendChild(segment);
+            }
+            
             const clickArea = document.getElementById('clickArea');
-            clickArea.onclick = function() {
-                score++;
-                clickTimes.push(Date.now());
-                document.getElementById('taskScore').textContent = score;
+            clickArea.style.background = '#ccc';
+            clickArea.textContent = '준비...';
+            
+            // 1초마다 클릭 타이밍
+            let segmentTimer = setInterval(() => {
+                if (currentSegment >= totalSegments) {
+                    clearInterval(segmentTimer);
+                    return;
+                }
                 
-                const progress = Math.min((score / 50) * 100, 100);
-                document.getElementById('taskProgressFill').style.width = progress + '%';
+                // 이전 세그먼트 비활성화
+                if (currentSegment > 0) {
+                    const prev = document.getElementById(`segment-${currentSegment - 1}`);
+                    if (!prev.classList.contains('failed')) {
+                        prev.classList.remove('active');
+                    }
+                }
+                
+                // 현재 세그먼트 활성화
+                const current = document.getElementById(`segment-${currentSegment}`);
+                current.classList.add('active');
+                canClick = true;
+                
+                clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                clickArea.textContent = '지금 클릭!';
+                
+                // 0.8초 후 타이밍 종료
+                setTimeout(() => {
+                    if (canClick) {
+                        // 클릭 안 함 = 실패
+                        fails++;
+                        document.getElementById('failCount').textContent = fails;
+                        current.classList.remove('active');
+                        current.classList.add('failed');
+                        canClick = false;
+                        clickArea.style.background = '#ccc';
+                        clickArea.textContent = '놓쳤어요!';
+                    }
+                }, 800);
+                
+                currentSegment++;
+            }, 1000);
+            
+            clickArea.onclick = function() {
+                if (canClick) {
+                    score++;
+                    clickTimes.push(Date.now());
+                    document.getElementById('taskScore').textContent = score;
+                    canClick = false;
+                    clickArea.style.background = '#51cf66';
+                    clickArea.textContent = '성공!';
+                    
+                    setTimeout(() => {
+                        clickArea.style.background = '#ccc';
+                        clickArea.textContent = '다음 타이밍을 기다리세요...';
+                    }, 200);
+                }
             };
             
             const timer = setInterval(() => {
@@ -929,48 +1071,62 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timer);
+                    clearInterval(segmentTimer);
                     clickArea.onclick = null;
                     gameData.game1.score = score;
+                    gameData.game1.fails = fails;
                     gameData.game1.consistency = clickTimes;
                     setTimeout(() => startSurvey1(), 1000);
                 }
             }, 1000);
         }
 
-        // 복잡 작업
+        // 복잡 작업 - 개선된 패턴 매칭
         function startComplexTask() {
             let timeLeft = 30;
             let score = 0;
             const patterns = [
-                { emoji: '🔴', color: '#ff6b6b', name: '빨강' },
-                { emoji: '🔵', color: '#4dabf7', name: '파랑' },
-                { emoji: '🟢', color: '#51cf66', name: '초록' },
-                { emoji: '🟡', color: '#ffd43b', name: '노랑' }
+                { emoji: '🔴', color: '#ff6b6b', name: '빨강', brightness: 1 },
+                { emoji: '🔵', color: '#4dabf7', name: '파랑', brightness: 2 },
+                { emoji: '🟢', color: '#51cf66', name: '초록', brightness: 3 },
+                { emoji: '🟡', color: '#ffd43b', name: '노랑', brightness: 4 }
             ];
             
-            const operations = ['같은 것', '다른 것', '더 밝은 것', '더 어두운 것'];
-            let currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
-            let currentOperation = operations[Math.floor(Math.random() * operations.length)];
+            const operations = ['같은 것', '다른 것'];
+            let currentPattern = null;
+            let currentOperation = null;
             const clickTimes = [];
             
+            document.getElementById('complexProgress').style.display = 'block';
+            
             const clickArea = document.getElementById('clickArea');
-            clickArea.innerHTML = `
-                <div style="font-size: 2em; margin-bottom: 20px;">${currentPattern.emoji}</div>
-                <div style="font-size: 1.3em;">${currentOperation}을 클릭!</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    ${patterns.map((p, idx) => `
-                        <button 
-                            id="option-${idx}"
-                            style="padding: 30px; font-size: 2em; border: 3px solid white; border-radius: 12px; cursor: pointer; background: ${p.color}; transition: all 0.2s;"
-                            onmouseover="this.style.transform='scale(1.1)'"
-                            onmouseout="this.style.transform='scale(1)'"
-                            onclick="checkComplexAnswer(${idx})"
-                        >
-                            ${p.emoji}
-                        </button>
-                    `).join('')}
-                </div>
-            `;
+            
+            function generateNewQuestion() {
+                currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
+                currentOperation = operations[Math.floor(Math.random() * operations.length)];
+                
+                // 밝기 비교는 제외 (예외 처리 복잡)
+                
+                clickArea.innerHTML = `
+                    <div style="font-size: 2em; margin-bottom: 20px;">${currentPattern.emoji}</div>
+                    <div style="font-size: 1.3em; margin-bottom: 20px;">${currentOperation}을 클릭!</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                        ${patterns.map((p, idx) => `
+                            <button 
+                                id="option-${idx}"
+                                style="padding: 30px; font-size: 2em; border: 3px solid white; border-radius: 12px; cursor: pointer; background: ${p.color}; transition: all 0.2s;"
+                                onmouseover="this.style.transform='scale(1.1)'"
+                                onmouseout="this.style.transform='scale(1)'"
+                                onclick="checkComplexAnswer(${idx})"
+                            >
+                                ${p.emoji}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            generateNewQuestion();
             
             const timer = setInterval(() => {
                 timeLeft--;
@@ -988,21 +1144,11 @@
                 let isCorrect = false;
                 const selected = patterns[selectedIdx];
                 
-                // 정답 판정
-                if (currentOperation === '같은 것' && selected.emoji === currentPattern.emoji) {
-                    isCorrect = true;
-                } else if (currentOperation === '다른 것' && selected.emoji !== currentPattern.emoji) {
-                    isCorrect = true;
-                } else if (currentOperation === '더 밝은 것') {
-                    const brightness = { '🟡': 4, '🟢': 3, '🔵': 2, '🔴': 1 };
-                    if (brightness[selected.emoji] > brightness[currentPattern.emoji]) {
-                        isCorrect = true;
-                    }
-                } else if (currentOperation === '더 어두운 것') {
-                    const brightness = { '🟡': 4, '🟢': 3, '🔵': 2, '🔴': 1 };
-                    if (brightness[selected.emoji] < brightness[currentPattern.emoji]) {
-                        isCorrect = true;
-                    }
+                // 정답 판정 (간단하게)
+                if (currentOperation === '같은 것') {
+                    isCorrect = (selected.emoji === currentPattern.emoji);
+                } else if (currentOperation === '다른 것') {
+                    isCorrect = (selected.emoji !== currentPattern.emoji);
                 }
                 
                 if (isCorrect) {
@@ -1012,17 +1158,12 @@
                     
                     // 피드백
                     const btn = document.getElementById(`option-${selectedIdx}`);
+                    const originalBg = btn.style.background;
                     btn.style.border = '5px solid #51cf66';
                     setTimeout(() => {
                         btn.style.border = '3px solid white';
-                    }, 200);
-                    
-                    // 새 문제
-                    currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
-                    currentOperation = operations[Math.floor(Math.random() * operations.length)];
-                    
-                    clickArea.querySelector('div:first-child').innerHTML = currentPattern.emoji;
-                    clickArea.querySelector('div:nth-child(2)').innerHTML = `${currentOperation}을 클릭!`;
+                        generateNewQuestion();
+                    }, 300);
                     
                     const progress = Math.min((score / 20) * 100, 100);
                     document.getElementById('taskProgressFill').style.width = progress + '%';
@@ -1032,7 +1173,7 @@
                     btn.style.border = '5px solid #ff6b6b';
                     setTimeout(() => {
                         btn.style.border = '3px solid white';
-                    }, 200);
+                    }, 300);
                 }
             };
         }
@@ -1074,7 +1215,7 @@
             }
         }
 
-        // 게임 2: 우선순위
+        // 게임 2: 우선순위 (클릭 순서 방식)
         function startGame2() {
             showScreen('game2Screen');
             
@@ -1090,17 +1231,56 @@
             ];
             
             const shuffled = tasks.sort(() => Math.random() - 0.5);
+            let selectedOrder = [];
             
             const cardsHtml = shuffled.map((task, idx) => `
-                <div class="priority-card" draggable="true" data-index="${idx}" data-task="${task}">
+                <div class="priority-card" data-index="${idx}" data-task="${task}" onclick="togglePriority(${idx})">
                     ${task}
                 </div>
             `).join('');
             
             document.getElementById('priorityCards').innerHTML = cardsHtml;
             
-            // 드래그 앤 드롭
-            setupDragAndDrop();
+            window.togglePriority = function(index) {
+                const card = document.querySelector(`.priority-card[data-index="${index}"]`);
+                const task = card.dataset.task;
+                
+                // 이미 선택되어 있으면 해제
+                const existingIndex = selectedOrder.indexOf(task);
+                if (existingIndex !== -1) {
+                    selectedOrder.splice(existingIndex, 1);
+                    card.classList.remove('selected');
+                    const numberBadge = card.querySelector('.priority-number');
+                    if (numberBadge) numberBadge.remove();
+                    
+                    // 뒤의 번호들 재정렬
+                    updatePriorityNumbers();
+                } else {
+                    // 새로 선택
+                    selectedOrder.push(task);
+                    card.classList.add('selected');
+                    const badge = document.createElement('div');
+                    badge.className = 'priority-number';
+                    badge.textContent = selectedOrder.length;
+                    card.appendChild(badge);
+                }
+                
+                gameData.game2.changes++;
+            };
+            
+            function updatePriorityNumbers() {
+                document.querySelectorAll('.priority-card').forEach(card => {
+                    const task = card.dataset.task;
+                    const orderIndex = selectedOrder.indexOf(task);
+                    
+                    if (orderIndex !== -1) {
+                        const badge = card.querySelector('.priority-number');
+                        if (badge) {
+                            badge.textContent = orderIndex + 1;
+                        }
+                    }
+                });
+            }
             
             // 타이머
             let timeLeft = 30;
@@ -1113,52 +1293,14 @@
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     gameData.game2.timeSpent = Date.now() - startTime;
-                    // 자동으로 제출
-                    submitPriorities();
+                    gameData.game2.priorities = selectedOrder;
+                    setTimeout(() => startSurvey2(), 500);
                 }
             }, 1000);
         }
 
-        function setupDragAndDrop() {
-            const cards = document.querySelectorAll('.priority-card');
-            let draggedElement = null;
-            
-            cards.forEach(card => {
-                card.addEventListener('dragstart', function(e) {
-                    draggedElement = this;
-                    this.classList.add('dragging');
-                    gameData.game2.changes++;
-                });
-                
-                card.addEventListener('dragend', function(e) {
-                    this.classList.remove('dragging');
-                });
-                
-                card.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                });
-                
-                card.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    if (draggedElement !== this) {
-                        const allCards = [...document.querySelectorAll('.priority-card')];
-                        const draggedIndex = allCards.indexOf(draggedElement);
-                        const targetIndex = allCards.indexOf(this);
-                        
-                        if (draggedIndex < targetIndex) {
-                            this.parentNode.insertBefore(draggedElement, this.nextSibling);
-                        } else {
-                            this.parentNode.insertBefore(draggedElement, this);
-                        }
-                    }
-                });
-            });
-        }
-
         function submitPriorities() {
-            const cards = document.querySelectorAll('.priority-card');
-            gameData.game2.priorities = Array.from(cards).map(card => card.dataset.task);
-            
+            // priorities already set in gameData.game2.priorities by click order
             setTimeout(() => startSurvey2(), 500);
         }
 
