@@ -1022,7 +1022,7 @@
                     </div>
                     <div class="step">
                         <div class="step-number">5</div>
-                        <strong>2주 시뮬레이션</strong>
+                        <strong>2주 여행 시뮬레이션</strong>
                         <p style="margin-top: 10px; font-size: 0.9em; color: #666;">5분</p>
                     </div>
                 </div>
@@ -1126,19 +1126,18 @@
             </div>
         </div>
 
-        <!-- 게임 3: 2주 시뮬레이션 -->
+        <!-- 게임 3: 2주 여행 시뮬레이션 -->
         <div class="screen" id="game3Screen">
             <div class="card simulation-game">
                 <div class="game-header">
-                    <h2>📅 게임 3: 2주 시뮬레이션</h2>
+                    <h2>✈️ 게임 3: 2주 여행 시뮬레이션</h2>
                     <p class="instruction">
-                        가상의 2주를 살아보세요.<br>
-                        매일 상황이 발생하면 <strong>직관적으로</strong> 선택하세요.
+                        2주간 여행을 떠났다고 상상해보세요.<br>
+                        여행 중 매일 벌어지는 상황에서 <strong>직관적으로</strong> 선택하세요.
                     </p>
                 </div>
 
                 <div class="day-indicator" id="dayIndicator"></div>
-                <div class="reaction-timer" id="reactionTimer"></div>
 
                 <div class="situation" id="situationContainer"></div>
             </div>
@@ -1345,78 +1344,78 @@
             }
         ];
 
-        // 2주 시뮬레이션 시나리오
+        // 2주 여행 시뮬레이션 시나리오
         const simulationScenarios = [
             {
                 day: 1,
-                situation: '첫날! 2주 프로젝트가 시작되었습니다.',
-                question: '어떻게 시작하시겠습니까?',
+                situation: '여행 첫날! 2주 일정이 시작됩니다. 공항에 도착해 이제 본격적으로 움직일 시간입니다.',
+                question: '어떻게 여행을 시작하시겠습니까?',
                 choices: [
-                    { text: '전체 계획부터 세밀하게 세운다', type: 'planner' },
-                    { text: '일단 시작하면서 방향을 잡는다', type: 'starter' }
+                    { text: '숙소·동선·예약부터 세밀하게 정리한다', type: 'planner' },
+                    { text: '일단 시내로 나가며 현장에서 방향을 잡는다', type: 'starter' }
                 ]
             },
             {
                 day: 3,
-                situation: '예상보다 진행이 느립니다. 계획의 30%만 완료했습니다.',
+                situation: '3일 차, 이동과 대기 시간이 길어져 여행 일정이 예상보다 많이 밀렸습니다.',
                 question: '어떻게 하시겠습니까?',
                 choices: [
-                    { text: '계획을 전면 재검토하고 수정한다', type: 'adaptive' },
-                    { text: '속도를 올려 계획대로 만회한다', type: 'pusher' }
+                    { text: '남은 일정을 다시 짜고 우선순위를 조정한다', type: 'adaptive' },
+                    { text: '속도를 올려 원래 일정에 최대한 맞춘다', type: 'pusher' }
                 ]
             },
             {
                 day: 5,
-                situation: '갑자기 더 흥미로운 아이디어가 떠올랐습니다.',
+                situation: '5일 차, 우연히 현지인에게 숨은 명소와 축제 정보를 들었습니다.',
                 question: '어떻게 하시겠습니까?',
                 choices: [
-                    { text: '새 아이디어를 시도해본다', type: 'explorer' },
-                    { text: '원래 계획을 지속한다', type: 'focused' }
+                    { text: '계획을 바꿔 새로운 장소와 축제를 경험한다', type: 'explorer' },
+                    { text: '처음 정한 여행 루트를 그대로 유지한다', type: 'focused' }
                 ]
             },
             {
                 day: 7,
-                situation: '일주일이 지났습니다. 중간 점검 시간입니다.',
+                situation: '7일 차, 여행의 절반이 지났습니다. 예산과 컨디션, 만족도를 점검할 시점입니다.',
                 question: '무엇을 하시겠습니까?',
                 choices: [
-                    { text: '세부 데이터를 분석하고 보고서 작성', type: 'analyzer' },
-                    { text: '전체적인 느낌만 체크하고 바로 진행', type: 'intuitive' }
+                    { text: '지출·이동·만족도를 꼼꼼히 정리해 남은 일정을 조정한다', type: 'analyzer' },
+                    { text: '전체적인 감만 확인하고 바로 다음 여행지로 이동한다', type: 'intuitive' }
                 ]
             },
             {
                 day: 9,
-                situation: '집중력이 많이 떨어집니다.',
+                situation: '9일 차, 이동이 누적되어 피로가 쌓이고 여행 집중력이 많이 떨어졌습니다.',
                 question: '어떻게 하시겠습니까?',
                 choices: [
-                    { text: '휴식을 취하고 리프레시한다', type: 'rest' },
-                    { text: '억지로라도 계속 밀고 나간다', type: 'grit' }
+                    { text: '카페나 숙소에서 쉬며 컨디션을 회복한다', type: 'rest' },
+                    { text: '힘들어도 예정한 코스를 끝까지 소화한다', type: 'grit' }
                 ]
             },
             {
                 day: 11,
-                situation: '예상치 못한 문제가 발생했습니다!',
+                situation: '11일 차, 예약에 문제가 생겨 숙소 체크인이나 이동편 연결이 꼬였습니다!',
                 question: '어떻게 대응하시겠습니까?',
                 choices: [
-                    { text: '원인을 파악하고 체계적으로 해결', type: 'systematic' },
-                    { text: '빠르게 우회 방법을 찾는다', type: 'agile' }
+                    { text: '문제 원인을 확인하고 예약·동선을 차근차근 다시 맞춘다', type: 'systematic' },
+                    { text: '근처 대안 숙소나 다른 이동편을 빠르게 찾아 우회한다', type: 'agile' }
                 ]
             },
             {
                 day: 13,
-                situation: '마감이 하루 앞으로 다가왔습니다.',
+                situation: '13일 차, 귀국이 가까워졌습니다. 남은 시간은 하루뿐이고 하고 싶은 것은 아직 많습니다.',
                 question: '마무리 전략은?',
                 choices: [
-                    { text: '완성도를 높이는 데 집중한다', type: 'quality' },
-                    { text: '핵심만 빠르게 마무리한다', type: 'speed' }
+                    { text: '정말 중요했던 장소와 경험을 깊게 즐기며 마무리한다', type: 'quality' },
+                    { text: '핵심 명소를 빠르게 훑으며 최대한 많이 본다', type: 'speed' }
                 ]
             },
             {
                 day: 14,
-                situation: '마지막 날! 프로젝트를 완료했습니다.',
-                question: '다음에는 무엇을 하시겠습니까?',
+                situation: '14일 차, 2주 여행의 마지막 날입니다. 이제 여행을 마무리할 시간입니다.',
+                question: '여행이 끝난 뒤 가장 먼저 하고 싶은 것은?',
                 choices: [
-                    { text: '회고하고 배운 점을 정리한다', type: 'reflective' },
-                    { text: '바로 다음 프로젝트를 시작한다', type: 'momentum' }
+                    { text: '사진과 기록을 정리하며 이번 여행을 돌아본다', type: 'reflective' },
+                    { text: '벌써 다음 여행지와 다음 일정을 찾아본다', type: 'momentum' }
                 ]
             }
         ];
@@ -1857,12 +1856,6 @@
             const reactionStart = Date.now();
             
             document.getElementById('dayIndicator').textContent = `📅 Day ${scenario.day}`;
-            
-            let reactionTime = 0;
-            const reactionTimer = setInterval(() => {
-                reactionTime = ((Date.now() - reactionStart) / 1000).toFixed(1);
-                document.getElementById('reactionTimer').textContent = `⏱️ 반응 시간: ${reactionTime}초`;
-            }, 100);
             
             const situationHtml = `
                 <h3>${scenario.situation}</h3>
