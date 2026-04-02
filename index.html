@@ -1062,10 +1062,10 @@
                         <p style="font-size: 1.3em; color: #333; margin-bottom: 10px;">
                             점수: <strong id="taskScore" style="color: #667eea;">0</strong>
                         </p>
+                        <div class="fail-counter" id="game1FailWrap" style="display: none; margin-bottom: 14px;">
+                            실패: <strong id="game1FailCount">0</strong>번
+                        </div>
                         <div id="simpleProgress" style="display: none;">
-                            <div class="fail-counter">
-                                실패: <strong id="failCount">0</strong>번
-                            </div>
                             <div class="circle-container" id="circleContainer"></div>
                         </div>
                         <div id="complexProgress" style="display: none;">
@@ -1076,6 +1076,9 @@
                     </div>
                     <div class="click-area" id="clickArea">
                         클릭하세요!
+                    </div>
+                    <div class="priority-footer" id="game1Footer" style="display:none; margin-top: 18px;">
+                        <button class="btn btn-primary" id="game1NextBtn" onclick="startSurvey1()">다음으로 →</button>
                     </div>
                 </div>
             </div>
@@ -1435,10 +1438,21 @@
         function selectTask(taskType) {
             gameData.game1.taskType = taskType;
             gameData.game1.startTime = Date.now();
-            
+            gameData.game1.score = 0;
+            gameData.game1.fails = 0;
+            gameData.game1.consistency = [];
+
             document.getElementById('taskSelection').style.display = 'none';
             document.getElementById('taskExecution').style.display = 'block';
-            
+            document.getElementById('simpleProgress').style.display = 'none';
+            document.getElementById('complexProgress').style.display = 'none';
+            document.getElementById('game1Footer').style.display = 'none';
+            document.getElementById('game1Timer').textContent = '30';
+            document.getElementById('taskScore').textContent = '0';
+            document.getElementById('game1FailCount').textContent = '0';
+            document.getElementById('game1FailWrap').style.display = 'block';
+            document.getElementById('taskProgressFill').style.width = '0%';
+
             if (taskType === 'simple') {
                 startSimpleTask();
             } else {
@@ -1453,11 +1467,14 @@
             let fails = 0;
             let currentSegment = 0;
             let canClick = false;
+            let isFinished = false;
             const totalSegments = 30;
             const clickTimes = [];
-            
-            // 원형 진행 표시 생성
+
             document.getElementById('simpleProgress').style.display = 'block';
+            document.getElementById('complexProgress').style.display = 'none';
+            document.getElementById('game1FailWrap').style.display = 'block';
+
             const circleContainer = document.getElementById('circleContainer');
             circleContainer.innerHTML = '';
             for (let i = 0; i < totalSegments; i++) {
@@ -1466,79 +1483,106 @@
                 segment.id = `segment-${i}`;
                 circleContainer.appendChild(segment);
             }
-            
+
             const clickArea = document.getElementById('clickArea');
             clickArea.style.background = '#ccc';
-            clickArea.textContent = '준비...';
-            
-            // 1초마다 클릭 타이밍
-            let segmentTimer = setInterval(() => {
-                if (currentSegment >= totalSegments) {
-                    clearInterval(segmentTimer);
-                    return;
-                }
-                
-                // 이전 세그먼트 비활성화
-                if (currentSegment > 0) {
-                    const prev = document.getElementById(`segment-${currentSegment - 1}`);
-                    if (!prev.classList.contains('failed')) {
-                        prev.classList.remove('active');
+            clickArea.textContent = '준비 중...';
+            clickArea.onclick = null;
+
+            function finishSimpleTask() {
+                if (isFinished) return;
+                isFinished = true;
+                canClick = false;
+                clickArea.onclick = null;
+                clickArea.style.background = '#e9ecef';
+                clickArea.textContent = '테스트 완료! 아래 다음 버튼을 눌러주세요.';
+                gameData.game1.score = score;
+                gameData.game1.fails = fails;
+                gameData.game1.consistency = clickTimes;
+                document.getElementById('game1Footer').style.display = 'flex';
+            }
+
+            function runSimpleTask() {
+                let segmentTimer = setInterval(() => {
+                    if (currentSegment >= totalSegments) {
+                        clearInterval(segmentTimer);
+                        return;
                     }
-                }
-                
-                // 현재 세그먼트 활성화
-                const current = document.getElementById(`segment-${currentSegment}`);
-                current.classList.add('active');
-                canClick = true;
-                
-                clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                clickArea.textContent = '지금 클릭!';
-                
-                // 0.8초 후 타이밍 종료
-                setTimeout(() => {
-                    if (canClick) {
-                        // 클릭 안 함 = 실패
-                        fails++;
-                        document.getElementById('failCount').textContent = fails;
-                        current.classList.remove('active');
-                        current.classList.add('failed');
-                        canClick = false;
-                        clickArea.style.background = '#ccc';
-                        clickArea.textContent = '놓쳤어요!';
+
+                    if (currentSegment > 0) {
+                        const prev = document.getElementById(`segment-${currentSegment - 1}`);
+                        if (!prev.classList.contains('failed')) {
+                            prev.classList.remove('active');
+                        }
                     }
-                }, 800);
-                
-                currentSegment++;
-            }, 1000);
-            
-            clickArea.onclick = function() {
-                if (canClick) {
-                    score++;
-                    clickTimes.push(Date.now());
-                    document.getElementById('taskScore').textContent = score;
-                    canClick = false;
-                    clickArea.style.background = '#51cf66';
-                    clickArea.textContent = '성공!';
-                    
+
+                    const current = document.getElementById(`segment-${currentSegment}`);
+                    current.classList.add('active');
+                    canClick = true;
+
+                    clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    clickArea.textContent = '지금 클릭!';
+
                     setTimeout(() => {
-                        clickArea.style.background = '#ccc';
-                        clickArea.textContent = '다음 타이밍을 기다리세요...';
-                    }, 200);
-                }
-            };
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('game1Timer').textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    clearInterval(segmentTimer);
-                    clickArea.onclick = null;
-                    gameData.game1.score = score;
-                    gameData.game1.fails = fails;
-                    gameData.game1.consistency = clickTimes;
-                    setTimeout(() => startSurvey1(), 1000);
+                        if (isFinished) return;
+                        if (canClick) {
+                            fails++;
+                            document.getElementById('game1FailCount').textContent = fails;
+                            current.classList.remove('active');
+                            current.classList.add('failed');
+                            canClick = false;
+                            clickArea.style.background = '#ccc';
+                            clickArea.textContent = '놓쳤어요!';
+                        }
+                    }, 800);
+
+                    currentSegment++;
+                }, 1000);
+
+                clickArea.onclick = function() {
+                    if (isFinished) return;
+                    if (canClick) {
+                        score++;
+                        clickTimes.push(Date.now());
+                        document.getElementById('taskScore').textContent = score;
+                        canClick = false;
+                        clickArea.style.background = '#51cf66';
+                        clickArea.textContent = '성공!';
+
+                        setTimeout(() => {
+                            if (isFinished) return;
+                            clickArea.style.background = '#ccc';
+                            clickArea.textContent = '다음 타이밍을 기다리세요...';
+                        }, 200);
+                    }
+                };
+
+                const timer = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('game1Timer').textContent = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        clearInterval(segmentTimer);
+                        finishSimpleTask();
+                    }
+                }, 1000);
+            }
+
+            let countdown = 3;
+            document.getElementById('game1Timer').textContent = '30';
+            clickArea.textContent = `시작까지 ${countdown}`;
+            const countdownTimer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    clickArea.textContent = `시작까지 ${countdown}`;
+                } else if (countdown === 0) {
+                    clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    clickArea.textContent = '시작!';
+                } else {
+                    clearInterval(countdownTimer);
+                    clickArea.style.background = '#ccc';
+                    runSimpleTask();
                 }
             }, 1000);
         }
@@ -1547,28 +1591,42 @@
         function startComplexTask() {
             let timeLeft = 30;
             let score = 0;
+            let fails = 0;
+            let isFinished = false;
             const patterns = [
                 { emoji: '🔴', color: '#ff6b6b', name: '빨강', brightness: 1 },
                 { emoji: '🔵', color: '#4dabf7', name: '파랑', brightness: 2 },
                 { emoji: '🟢', color: '#51cf66', name: '초록', brightness: 3 },
                 { emoji: '🟡', color: '#ffd43b', name: '노랑', brightness: 4 }
             ];
-            
+
             const operations = ['같은 것', '다른 것'];
             let currentPattern = null;
             let currentOperation = null;
             const clickTimes = [];
-            
+
+            document.getElementById('simpleProgress').style.display = 'none';
             document.getElementById('complexProgress').style.display = 'block';
-            
+            document.getElementById('game1FailWrap').style.display = 'block';
+
             const clickArea = document.getElementById('clickArea');
-            
+
+            function finishComplexTask() {
+                isFinished = true;
+                clickArea.innerHTML = '테스트 완료! 아래 다음 버튼을 눌러주세요.';
+                clickArea.style.background = '#e9ecef';
+                gameData.game1.score = score;
+                gameData.game1.fails = fails;
+                gameData.game1.consistency = clickTimes;
+                document.getElementById('game1Footer').style.display = 'flex';
+            }
+
             function generateNewQuestion() {
+                if (isFinished) return;
+
                 currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
                 currentOperation = operations[Math.floor(Math.random() * operations.length)];
-                
-                // 밝기 비교는 제외 (예외 처리 복잡)
-                
+
                 clickArea.innerHTML = `
                     <div style="font-size: 2em; margin-bottom: 20px;">${currentPattern.emoji}</div>
                     <div style="font-size: 1.3em; margin-bottom: 20px;">${currentOperation}을 클릭!</div>
@@ -1587,53 +1645,53 @@
                     </div>
                 `;
             }
-            
+
             generateNewQuestion();
-            
+
             const timer = setInterval(() => {
                 timeLeft--;
                 document.getElementById('game1Timer').textContent = timeLeft;
-                
+
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    gameData.game1.score = score;
-                    gameData.game1.consistency = clickTimes;
-                    setTimeout(() => startSurvey1(), 1000);
+                    finishComplexTask();
                 }
             }, 1000);
-            
+
             window.checkComplexAnswer = function(selectedIdx) {
+                if (isFinished) return;
+
                 let isCorrect = false;
                 const selected = patterns[selectedIdx];
-                
-                // 정답 판정 (간단하게)
+
                 if (currentOperation === '같은 것') {
                     isCorrect = (selected.emoji === currentPattern.emoji);
                 } else if (currentOperation === '다른 것') {
                     isCorrect = (selected.emoji !== currentPattern.emoji);
                 }
-                
+
                 if (isCorrect) {
                     score++;
                     clickTimes.push(Date.now());
                     document.getElementById('taskScore').textContent = score;
-                    
-                    // 피드백
+
                     const btn = document.getElementById(`option-${selectedIdx}`);
-                    const originalBg = btn.style.background;
                     btn.style.border = '5px solid #51cf66';
                     setTimeout(() => {
+                        if (isFinished) return;
                         btn.style.border = '3px solid white';
                         generateNewQuestion();
                     }, 300);
-                    
+
                     const progress = Math.min((score / 20) * 100, 100);
                     document.getElementById('taskProgressFill').style.width = progress + '%';
                 } else {
-                    // 오답 피드백
+                    fails++;
+                    document.getElementById('game1FailCount').textContent = fails;
                     const btn = document.getElementById(`option-${selectedIdx}`);
                     btn.style.border = '5px solid #ff6b6b';
                     setTimeout(() => {
+                        if (isFinished) return;
                         btn.style.border = '3px solid white';
                     }, 300);
                 }
