@@ -11,12 +11,45 @@
             box-sizing: border-box;
         }
 
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            word-break: keep-all;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .result-section,
+        .gap-analysis,
+        .highlight,
+        .task-card,
+        .priority-card,
+        .survey-option,
+        .choice-btn,
+        .situation {
+            overflow-wrap: anywhere;
         }
 
         .container {
@@ -569,6 +602,184 @@
             color: white;
         }
 
+        .btn-kakao {
+            background: #fee500;
+            color: #191919;
+            box-shadow: 0 12px 28px rgba(254, 229, 0, 0.28);
+        }
+
+        .btn-kakao:hover {
+            background: #f7dc00;
+        }
+
+        body.share-sheet-open {
+            overflow: hidden;
+        }
+
+        .share-sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.46);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 9999;
+            padding: 18px;
+        }
+
+        .share-sheet-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .share-sheet {
+            width: min(100%, 520px);
+            background: #ffffff;
+            border-radius: 28px 28px 20px 20px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+            padding: 14px 18px 18px;
+            transform: translateY(24px);
+            transition: transform 0.25s ease;
+        }
+
+        .share-sheet-overlay.active .share-sheet {
+            transform: translateY(0);
+        }
+
+        .share-sheet-handle {
+            width: 48px;
+            height: 5px;
+            border-radius: 999px;
+            background: #d9deea;
+            margin: 0 auto 16px;
+        }
+
+        .share-sheet-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .share-sheet-title {
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: #191919;
+            margin-bottom: 6px;
+        }
+
+        .share-sheet-subtitle {
+            font-size: 0.92rem;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .share-sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .share-action {
+            border: none;
+            border-radius: 22px;
+            padding: 16px 12px;
+            background: #f5f7fb;
+            color: #222b55;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            min-height: 122px;
+        }
+
+        .share-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(82, 95, 180, 0.12);
+        }
+
+        .share-action.kakao {
+            background: linear-gradient(180deg, #fff7a8 0%, #fee500 100%);
+            color: #191919;
+        }
+
+        .share-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: #ffffff;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        }
+
+        .share-action.kakao .share-icon {
+            background: #3c1e1e;
+            color: #fee500;
+        }
+
+        .share-label {
+            font-size: 0.94rem;
+            font-weight: 800;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        .share-description {
+            font-size: 0.79rem;
+            line-height: 1.45;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .share-action.kakao .share-description {
+            color: rgba(25, 25, 25, 0.78);
+        }
+
+        .share-sheet-close {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            background: #eef2f9;
+            color: #475569;
+            font-weight: 700;
+            padding: 14px 16px;
+            cursor: pointer;
+        }
+
+        .share-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(16px);
+            min-width: 220px;
+            max-width: calc(100vw - 32px);
+            background: rgba(17, 24, 39, 0.92);
+            color: #ffffff;
+            padding: 13px 16px;
+            border-radius: 14px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+            z-index: 10000;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.24);
+        }
+
+        .share-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
@@ -822,7 +1033,7 @@
 
         @media (max-width: 768px) {
             body {
-                padding: 12px;
+                padding: 10px;
             }
 
             .container {
@@ -830,8 +1041,15 @@
             }
 
             .card {
-                padding: 22px 16px;
+                padding: 20px 14px;
                 border-radius: 20px;
+            }
+
+            .start-btn {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1.08em;
+                margin: 24px auto;
             }
 
             .intro-screen h1 {
@@ -859,6 +1077,12 @@
 
             .task-choice {
                 flex-direction: column;
+                gap: 12px;
+            }
+
+            .process-steps {
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
 
             .task-card,
@@ -887,6 +1111,17 @@
                 gap: 12px;
                 min-height: auto;
                 margin: 22px 0;
+            }
+
+            .circle-container {
+                max-width: 252px;
+                gap: 6px;
+            }
+
+            .circle-segment {
+                width: 34px;
+                height: 34px;
+                font-size: 0.72em;
             }
 
             .priority-card {
@@ -926,12 +1161,41 @@
 
             .btn-group {
                 gap: 10px;
+                flex-direction: column;
             }
 
             .btn {
                 width: 100%;
+                min-height: 52px;
                 padding: 14px 18px;
                 font-size: 1em;
+            }
+
+            .share-sheet-overlay {
+                padding: 10px;
+            }
+
+            .share-sheet {
+                width: 100%;
+                border-radius: 24px 24px 18px 18px;
+                padding: 12px 14px 14px;
+            }
+
+            .share-sheet-grid {
+                gap: 10px;
+            }
+
+            .share-action {
+                min-height: 112px;
+                border-radius: 18px;
+                padding: 14px 10px;
+            }
+
+            .share-icon {
+                width: 46px;
+                height: 46px;
+                border-radius: 16px;
+                font-size: 1.18rem;
             }
 
             .back-btn {
@@ -977,6 +1241,128 @@
             .character-info-card,
             .file-guide-card {
                 padding: 16px;
+            }
+
+            #personalityResult .result-section {
+                padding: 20px 16px !important;
+                border-radius: 18px !important;
+                margin-top: 16px !important;
+            }
+
+            #personalityResult .result-section h3,
+            #personalityResult .result-section strong {
+                line-height: 1.45;
+            }
+
+            #personalityResult .result-section p,
+            #personalityResult .result-section span,
+            #personalityResult .result-section div {
+                word-break: keep-all;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .card {
+                padding: 18px 12px;
+                border-radius: 18px;
+            }
+
+            .intro-screen h1 {
+                font-size: 1.72em;
+            }
+
+            .intro-screen .subtitle,
+            .game-header .instruction,
+            .highlight p,
+            .situation p,
+            .survey-option,
+            .choice-btn,
+            .priority-card,
+            .gap-item,
+            .insight {
+                font-size: 0.95em;
+                line-height: 1.65;
+            }
+
+            .highlight,
+            .gap-analysis,
+            .situation,
+            .task-card,
+            .priority-card,
+            .survey-option,
+            .choice-btn,
+            .gap-item,
+            .insight {
+                padding: 14px;
+            }
+
+            .timer,
+            .time-pressure,
+            .day-indicator,
+            .reaction-timer {
+                width: 100%;
+                text-align: center;
+                font-size: 0.96em;
+                padding: 10px 14px;
+            }
+
+            .circle-container {
+                max-width: 228px;
+                gap: 5px;
+            }
+
+            .circle-segment {
+                width: 30px;
+                height: 30px;
+                font-size: 0.66em;
+            }
+
+            .character-card-section {
+                padding: 18px 14px;
+            }
+
+            .character-card-badge,
+            .character-chip,
+            .character-code-pill {
+                font-size: 0.76rem;
+            }
+
+            .character-card-title {
+                font-size: 1.32rem;
+            }
+
+            .character-card-summary {
+                font-size: 0.9rem;
+                line-height: 1.65;
+            }
+
+            #personalityResult .result-section {
+                padding: 18px 14px !important;
+            }
+
+            #personalityResult .result-section [style*="font-size:2.2em"] {
+                font-size: 1.8em !important;
+            }
+
+            .share-sheet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .share-action {
+                min-height: auto;
+                flex-direction: row;
+                justify-content: flex-start;
+                text-align: left;
+                gap: 12px;
+            }
+
+            .share-label,
+            .share-description {
+                text-align: left;
             }
         }
     </style>
@@ -1159,13 +1545,51 @@
                 <div id="personalityResult"></div>
 
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="downloadImage()">이미지 다운로드</button>
+                    <button class="btn btn-primary" onclick="saveResultImage()">이미지 저장</button>
+                    <button class="btn btn-kakao" onclick="openShareSheet()">카카오톡 스타일 공유</button>
                     <button class="btn btn-secondary" onclick="location.reload()">다시 하기</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="share-sheet-overlay" id="shareSheetOverlay" aria-hidden="true" onclick="handleShareSheetBackdrop(event)">
+        <div class="share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareSheetTitle">
+            <div class="share-sheet-handle"></div>
+            <div class="share-sheet-header">
+                <div class="share-sheet-title" id="shareSheetTitle">카카오톡 스타일 공유</div>
+                <div class="share-sheet-subtitle">모바일에서 바로 공유하거나, 링크를 복사하고 이미지를 저장할 수 있어요.</div>
+            </div>
+            <div class="share-sheet-grid">
+                <button class="share-action kakao" onclick="shareResultImage()">
+                    <span class="share-icon">톡</span>
+                    <span>
+                        <span class="share-label">메신저로 바로 공유</span>
+                        <span class="share-description">지원 기기에서는 카카오톡 등 공유 대상을 바로 선택할 수 있어요.</span>
+                    </span>
+                </button>
+                <button class="share-action" onclick="copyShareLink()">
+                    <span class="share-icon">🔗</span>
+                    <span>
+                        <span class="share-label">링크 복사</span>
+                        <span class="share-description">현재 페이지 주소와 공유 문구를 빠르게 복사합니다.</span>
+                    </span>
+                </button>
+                <button class="share-action" onclick="saveResultImage()">
+                    <span class="share-icon">🖼️</span>
+                    <span>
+                        <span class="share-label">이미지 저장</span>
+                        <span class="share-description">결과 영역을 PNG 이미지로 저장합니다.</span>
+                    </span>
+                </button>
+            </div>
+            <button class="share-sheet-close" onclick="closeShareSheet()">닫기</button>
+        </div>
+    </div>
+
+    <div class="share-toast" id="shareToast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         // 전역 데이터
         const gameData = {
@@ -1259,14 +1683,6 @@
                         <p class="character-card-summary" style="max-width:720px; margin:0 auto;">${asset.note}</p>
                     </div>
 
-                    <div style="max-width:760px; margin:0 auto;">
-                        <div class="file-guide-card">
-                            <strong>파일 교체 가이드</strong>
-                            1. <code>${asset.image}</code> 경로에 원하는 그림 파일을 넣으면 됩니다.<br>
-                            2. 비율은 1:1 기준으로 표시되며, 정사각형 이미지를 넣으면 가장 깔끔합니다.<br>
-                            3. 파일명이나 확장자를 바꾸고 싶으면 <code>typeCharacterAssets</code>의 <code>image</code> 값만 수정하면 됩니다.
-                        </div>
-                    </div>
                 </div>
             `;
         }
@@ -2396,10 +2812,185 @@
         }
 
 
-        function downloadImage() {
-            alert('이미지 다운로드 기능은 다음 버전에서 제공됩니다!');
+        async function renderResultCanvas() {
+            const target = document.getElementById('personalityResult');
+
+            if (!target || !target.innerHTML.trim()) {
+                alert('먼저 결과 화면을 생성한 뒤 시도해 주세요.');
+                return null;
+            }
+
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 저장 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+                return null;
+            }
+
+            const images = Array.from(target.querySelectorAll('img'));
+            await Promise.all(images.map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            }));
+
+            return await html2canvas(target, {
+                backgroundColor: '#ffffff',
+                scale: Math.min(window.devicePixelRatio || 1, 2),
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                scrollX: 0,
+                scrollY: -window.scrollY,
+                windowWidth: document.documentElement.scrollWidth
+            });
+        }
+
+        function canvasToBlob(canvas) {
+            return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1));
+        }
+
+        function getResultFileName() {
+            const codeText = document.querySelector('.character-chip')?.textContent || 'growth-character-result';
+            const normalized = codeText
+                .replace(/유형 코드\s*/g, '')
+                .trim()
+                .replace(/[^a-zA-Z0-9가-힣_-]+/g, '-');
+            const date = new Date().toISOString().slice(0, 10);
+            return `${normalized || 'growth-character-result'}-${date}.png`;
+        }
+
+        function getShareText() {
+            const title = document.querySelector('.character-card-title')?.textContent?.trim() || '나의 성장 캐릭터 테스트 결과';
+            const summary = document.querySelector('.character-card-summary')?.textContent?.trim() || '내 성장 캐릭터 테스트 결과를 확인해 보세요.';
+            return `${title}\n${summary}\n${location.href}`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('shareToast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function openShareSheet() {
+            const overlay = document.getElementById('shareSheetOverlay');
+            if (!overlay) return;
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('share-sheet-open');
+        }
+
+        function closeShareSheet() {
+            const overlay = document.getElementById('shareSheetOverlay');
+            if (!overlay) return;
+            overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('share-sheet-open');
+        }
+
+        function handleShareSheetBackdrop(event) {
+            if (event.target && event.target.id === 'shareSheetOverlay') {
+                closeShareSheet();
+            }
+        }
+
+        async function copyShareLink() {
+            try {
+                const text = getShareText();
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    textarea.remove();
+                }
+                closeShareSheet();
+                showToast('공유 문구와 링크를 복사했어요.');
+            } catch (error) {
+                console.error(error);
+                alert('링크 복사 중 문제가 발생했습니다. 다시 시도해 주세요.');
+            }
+        }
+
+        async function saveResultImage() {
+            try {
+                const canvas = await renderResultCanvas();
+                if (!canvas) return;
+
+                const blob = await canvasToBlob(canvas);
+                if (!blob) throw new Error('이미지 생성 실패');
+
+                const fileName = getResultFileName();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (error) {
+                console.error(error);
+                alert('이미지 저장 중 문제가 발생했습니다. 다시 시도해 주세요.');
+            }
+        }
+
+        async function shareResultImage() {
+            try {
+                const shareTitle = '나의 성장 캐릭터 테스트 결과';
+                const shareText = getShareText();
+                const shareUrl = location.href;
+
+                const canvas = await renderResultCanvas();
+                if (!canvas) return;
+
+                const blob = await canvasToBlob(canvas);
+                if (!blob) throw new Error('공유용 이미지 생성 실패');
+
+                const fileName = getResultFileName();
+                const file = new File([blob], fileName, { type: 'image/png' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: shareTitle,
+                        text: shareText
+                    });
+                    closeShareSheet();
+                    showToast('공유 창을 열었어요.');
+                    return;
+                }
+
+                if (navigator.share) {
+                    await navigator.share({
+                        title: shareTitle,
+                        text: shareText,
+                        url: shareUrl
+                    });
+                    closeShareSheet();
+                    showToast('공유 창을 열었어요.');
+                    return;
+                }
+
+                await copyShareLink();
+            } catch (error) {
+                if (error && error.name === 'AbortError') return;
+                console.error(error);
+                alert('공유 중 문제가 발생했습니다. 다시 시도해 주세요.');
+            }
+        }
+
+        async function downloadImage() {
+            await saveResultImage();
         }
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
