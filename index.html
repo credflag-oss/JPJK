@@ -1181,42 +1181,43 @@
         let currentDay = 0;
 
         const typeCharacterAssets = {
-            SPOAC: { character: '티아나', animation: '공주와 개구리', image: './characters/SPOAC.webp', note: '계획적이고 현실적으로 꿈을 성과로 바꾸는 캐릭터 무드' },
-            SPOAT: { character: '뮬란', animation: '뮬란', image: './characters/SPOAT.webp', note: '치밀하게 준비하고 압박 속에서 강해지는 캐릭터 무드' },
-            SPOXC: { character: '히로 하마다', animation: '빅 히어로', image: './characters/SPOXC.webp', note: '구조를 읽고 새로운 해법을 설계하는 캐릭터 무드' }, // 히컵 대체
-            SPOXT: { character: '라야', animation: '라야와 마지막 드래곤', image: './characters/SPOXT.webp', note: '전략을 유지하며 낯선 세계를 돌파하는 캐릭터 무드' },
-            SPGAC: { character: '레미', animation: '라따뚜이', image: './characters/SPGAC.webp', note: '루틴과 경험으로 실력을 쌓아가는 캐릭터 무드' }, // 키키 대체
-            SPGAT: { character: '제인 포터', animation: '타잔', image: './characters/SPGAT.webp', note: '목표가 생기면 깊게 몰입하는 캐릭터 무드' }, // 시즈쿠 대체
-            SPGXC: { character: '벨', animation: '미녀와 야수', image: './characters/SPGXC.webp', note: '배우고 이해하며 자기 세계를 넓히는 캐릭터 무드' },
-            SPGXT: { character: '키다', animation: '아틀란티스: 잃어버린 제국', image: './characters/SPGXT.webp', note: '넓은 시야로 세상을 확장하는 캐릭터 무드' }, // 나우시카 대체
+    SPOAC: { character: '리바이 아커만', animation: '진격의 거인', image: './characters/SPOAC.png', note: '계획적이고 현실적으로 꿈을 성과로 바꾸는 캐릭터 무드' },
+    SPOAT: { character: '롤로노아 조로', animation: '원피스', image: './characters/SPOAT.png', note: '치밀하게 준비하고 압박 속에서 강해지는 캐릭터 무드' },
+    SPOXC: { character: '이시가미 센쿠', animation: '닥터 스톤', image: './characters/SPOXC.png', note: '구조를 읽고 새로운 해법을 설계하는 캐릭터 무드' },
+    SPOXT: { character: '리무루 템페스트', animation: '전생했더니 슬라임이었던 건에 대하여', image: './characters/SPOXT.png', note: '전략을 유지하며 낯선 세계를 돌파하는 캐릭터 무드' },
+    SPGAC: { character: '마쿠노우치 잇포', animation: '더 파이팅', image: './characters/SPGAC.png', note: '루틴과 경험으로 실력을 쌓아가는 캐릭터 무드' },
+    SPGAT: { character: '손오공', animation: '드래곤볼', image: './characters/SPGAT.png', note: '목표가 생기면 깊게 몰입하는 캐릭터 무드' },
+    SPGXC: { character: '마오마오', animation: '약사의 혼잣말', image: './characters/SPGXC.png', note: '배우고 이해하며 자기 세계를 넓히는 캐릭터 무드' },
+    SPGXT: { character: '몽키 D. 루피', animation: '원피스', image: './characters/SPGXT.png', note: '넓은 시야로 세상을 확장하는 캐릭터 무드' },
 
-            SIOAC: { character: '주디 홉스', animation: '주토피아', image: './characters/SIOAC.webp', note: '원칙과 속도를 함께 가져가는 캐릭터 무드' },
-            SIOAT: { character: '엘라스티걸', animation: '인크레더블 2', image: './characters/SIOAT.webp', note: '정리된 기준 위에서 강한 실행을 보여주는 캐릭터 무드' },
-            SIOXC: { character: '마일로 쌔치', animation: '아틀란티스: 잃어버린 제국', image: './characters/SIOXC.webp', note: '지식을 구조화해 탐험으로 연결하는 캐릭터 무드' },
-            SIOXT: { character: '짐 호킨스', animation: '보물성', image: './characters/SIOXT.webp', note: '반항성과 추진력으로 길을 여는 캐릭터 무드' },
-            SIGAC: { character: '헤라클레스', animation: '헤라클레스', image: './characters/SIGAC.webp', note: '성실하게 배움을 몸에 익히는 캐릭터 무드' }, // 탄지로 대체
-            SIGAT: { character: '미라벨', animation: '엔칸토: 마법의 세계', image: './characters/SIGAT.webp', note: '압박 속에서 급성장하는 몰입형 캐릭터 무드' }, // 미도리야 대체
-            SIGXC: { character: '루이스', animation: '로빈슨 가족', image: './characters/SIGXC.webp', note: '지식을 실험과 해결로 바꾸는 캐릭터 무드' }, // 센쿠 대체
-            SIGXT: { character: '타잔', animation: '타잔', image: './characters/SIGXT.webp', note: '실력과 세계를 함께 넓혀가는 캐릭터 무드' }, // 에드워드 대체
+    SIOAC: { character: '히츠가야 토시로', animation: '블리치', image: './characters/SIOAC.png', note: '원칙과 속도를 함께 가져가는 캐릭터 무드' },
+    SIOAT: { character: '로이 머스탱', animation: '강철의 연금술사', image: './characters/SIOAT.png', note: '정리된 기준 위에서 강한 실행을 보여주는 캐릭터 무드' },
+    SIOXC: { character: '아르민 알레르토', animation: '진격의 거인', image: './characters/SIOXC.png', note: '지식을 구조화해 탐험으로 연결하는 캐릭터 무드' },
+    SIOXT: { character: '쿠로사키 이치고', animation: '블리치', image: './characters/SIOXT.png', note: '반항성과 추진력으로 길을 여는 캐릭터 무드' },
+    SIGAC: { character: '카마도 탄지로', animation: '귀멸의 칼날', image: './characters/SIGAC.png', note: '성실하게 배움을 몸에 익히는 캐릭터 무드' },
+    SIGAT: { character: '미도리야 이즈쿠', animation: '나의 히어로 아카데미아', image: './characters/SIGAT.png', note: '압박 속에서 급성장하는 몰입형 캐릭터 무드' },
+    SIGXC: { character: '에도가와 코난', animation: '명탐정 코난', image: './characters/SIGXC.png', note: '지식을 실험과 해결로 바꾸는 캐릭터 무드' },
+    SIGXT: { character: '에드워드 엘릭', animation: '강철의 연금술사', image: './characters/SIGXT.png', note: '실력과 세계를 함께 넓혀가는 캐릭터 무드' },
 
-            // F - 감성/유연형
-            FPOAC: { character: '신데렐라', animation: '신데렐라', image: './characters/FPOAC.webp', note: '상황을 읽고 적응하며 끝내 완수하는 캐릭터 무드' }, // 치히로 대체
-            FPOAT: { character: '엘사', animation: '겨울왕국', image: './characters/FPOAT.webp', note: '유연하지만 결정적 순간 강해지는 캐릭터 무드' }, // 소피 대체
-            FPOXC: { character: '모아나', animation: '모아나', image: './characters/FPOXC.webp', note: '흐름을 읽어 새로운 방향을 잡는 캐릭터 무드' },
-            FPOXT: { character: '포카혼타스', animation: '포카혼타스', image: './characters/FPOXT.webp', note: '균형감과 통찰로 낯선 세계에 들어가는 캐릭터 무드' }, // 아시타카 대체
-            FPGAC: { character: '안나', animation: '겨울왕국', image: './characters/FPGAC.webp', note: '관계와 경험 속에서 성장하는 캐릭터 무드' },
-            FPGAT: { character: '메이 리', animation: '메이의 새빨간 비밀', image: './characters/FPGAT.webp', note: '감정 에너지로 몰입하며 성장하는 캐릭터 무드' },
-            FPGXC: { character: '라푼젤', animation: '라푼젤', image: './characters/FPGXC.webp', note: '호기심으로 세상을 탐색하며 정체성을 넓히는 캐릭터 무드' },
-            FPGXT: { character: '러셀', animation: '업', image: './characters/FPGXT.webp', note: '개방성과 적응력으로 세계를 확장하는 캐릭터 무드' }, // 아앙 대체
+    // F - 감성/유연형 (Feeling)
+    FPOAC: { character: '이카리 신지', animation: '에반게리온', image: './characters/FPOAC.png', note: '상황을 읽고 적응하며 끝내 완수하는 캐릭터 무드' },
+    FPOAT: { character: '아가츠마 젠이츠', animation: '귀멸의 칼날', image: './characters/FPOAT.png', note: '유연하지만 결정적 순간 강해지는 캐릭터 무드' },
+    FPOXC: { character: '죠셉 죠스타', animation: '죠죠의 기묘한 모험', image: './characters/FPOXC.png', note: '흐름을 읽어 새로운 방향을 잡는 캐릭터 무드' },
+    FPOXT: { character: '바이올렛 에버가든', animation: '바이올렛 에버가든', image: './characters/FPOXT.png', note: '균형감과 통찰로 낯선 세계에 들어가는 캐릭터 무드' },
+    FPGAC: { character: '우즈마키 나루토', animation: '나루토', image: './characters/FPGAC.png', note: '관계와 경험 속에서 성장하는 캐릭터 무드' },
+    FPGAT: { character: '히나타 쇼요', animation: '하이큐!!', image: './characters/FPGAT.png', note: '감정 에너지로 몰입하며 성장하는 캐릭터 무드' },
+    FPGXC: { character: '아냐 포저', animation: '스파이 패밀리', image: './characters/FPGXC.png', note: '호기심으로 세상을 탐색하며 정체성을 넓히는 캐릭터 무드' },
+    FPGXT: { character: '밧슈 더 스탬피드', animation: '트라이건', image: './characters/FPGXT.png', note: '개방성과 적응력으로 세계를 확장하는 캐릭터 무드' },
 
-            FIOAC: { character: '닉 와일드', animation: '주토피아', image: './characters/FIOAC.webp', note: '자기 방식대로 시작해 현실적으로 마무리하는 캐릭터 무드' }, // 슈렉 대체
-            FIOAT: { character: '주먹왕 랄프', animation: '주먹왕 랄프', image: './characters/FIOAT.webp', note: '압박을 추진력으로 바꾸는 실행형 캐릭터 무드' }, // 포 대체
-            FIOXC: { character: '미겔', animation: '코코', image: './characters/FIOXC.webp', note: '감정과 아이디어를 즉시 움직임으로 바꾸는 캐릭터 무드' },
-            FIOXT: { character: '메리다', animation: '메리다와 마법의 숲', image: './characters/FIOXT.webp', note: '자기 감각으로 새로운 길을 여는 캐릭터 무드' },
-            FIGAC: { character: '루카', animation: '루카', image: './characters/FIGAC.webp', note: '직접 부딪히며 경험을 성장 자산으로 바꾸는 캐릭터 무드' },
-            FIGAT: { character: '아리엘', animation: '인어공주', image: './characters/FIGAT.webp', note: '호기심과 열망으로 깊게 뛰어드는 캐릭터 무드' },
-            FIGXC: { character: '앨리스', animation: '이상한 나라의 앨리스', image: './characters/FIGXC.webp', note: '낯선 세계를 직접 탐험해야 직성이 풀리는 캐릭터 무드' }, // 코랄라인 대체
-            FIGXT: { character: '루스 노세다', animation: '아울 하우스', image: './characters/FIGXT.webp', note: '상상력과 탐험심으로 자기 세계를 확장하는 캐릭터 무드' }
+    FIOAC: { character: '사카타 긴토키', animation: '은혼', image: './characters/FIOAC.png', note: '자기 방식대로 시작해 현실적으로 마무리하는 캐릭터 무드' },
+    FIOAT: { character: '하시비라 이노스케', animation: '귀멸의 칼날', image: './characters/FIOAT.png', note: '압박을 추진력으로 바꾸는 실행형 캐릭터 무드' },
+    FIOXC: { character: '곤 프릭스', animation: '헌터X헌터', image: './characters/FIOXC.png', note: '감정과 아이디어를 즉시 움직임으로 바꾸는 캐릭터 무드' },
+    FIOXT: { character: '쿠죠 죠린', animation: '죠죠의 기묘한 모험', image: './characters/FIOXT.png', note: '자기 감각으로 새로운 길을 여는 캐릭터 무드' },
+    FIGAC: { character: '노하라 신노스케', animation: '짱구는 못말려', image: './characters/FIGAC.png', note: '직접 부딪히며 경험을 성장 자산으로 바꾸는 캐릭터 무드' },
+    FIGAT: { character: '리코', animation: '메이드 인 어비스', image: './characters/FIGAT.png', note: '호기심과 열망으로 깊게 뛰어드는 캐릭터 무드' },
+    FIGXC: { character: '프리렌', animation: '장송의 프리렌', image: './characters/FIGXC.png', note: '낯선 세계를 직접 탐험해야 직성이 풀리는 캐릭터 무드' },
+    FIGXT: { character: '덴지', animation: '체인소 맨', image: './characters/FIGXT.png', note: '상상력과 탐험심으로 자기 세계를 확장하는 캐릭터 무드' }
+};
             
         };
 
