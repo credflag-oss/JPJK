@@ -1261,6 +1261,81 @@
             }
         }
 
+        /* 두더지 잡기 */
+        .mole-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 320px;
+            margin: 20px auto;
+        }
+        .mole-hole {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #5c3d2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 4px solid #3e2723;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .mole-hole.active {
+            background: #795548;
+            transform: scale(1.05);
+        }
+        .mole-hole .mole {
+            transition: transform 0.15s;
+            transform: translateY(100%);
+        }
+        .mole-hole.active .mole {
+            transform: translateY(0%);
+        }
+        .mole-hole.hit .mole {
+            transform: translateY(100%);
+        }
+
+        /* 스트룹 테스트 */
+        .stroop-word {
+            font-size: 3em;
+            font-weight: 900;
+            text-align: center;
+            margin: 20px 0 24px;
+            letter-spacing: 0.02em;
+        }
+        .stroop-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+        .stroop-btn {
+            padding: 18px 10px;
+            font-size: 1.1em;
+            font-weight: 800;
+            border: 3px solid transparent;
+            border-radius: 14px;
+            cursor: pointer;
+            background: #f5f5f5;
+            color: #333;
+            transition: border-color 0.15s, transform 0.1s;
+        }
+        .stroop-btn:active {
+            transform: scale(0.95);
+        }
+        .stroop-btn.correct {
+            border-color: #51cf66 !important;
+        }
+        .stroop-btn.wrong {
+            border-color: #ff6b6b !important;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -1427,12 +1502,12 @@
                 <div id="taskSelection">
                     <div class="task-choice">
                         <div class="task-card" onclick="selectTask('simple')">
-                            <h3>🔄 리듬 반응형</h3>
-                            <p>같은 동작을<br>안정적으로 반복하기</p>
+                            <h3>🐹 두더지 잡기</h3>
+                            <p>순발력과 집중력으로<br>두더지를 잡아라!</p>
                         </div>
                         <div class="task-card" onclick="selectTask('complex')">
-                            <h3>🧩 패턴 판단형</h3>
-                            <p>다양한 패턴을<br>빠르게 구분하고 선택하기</p>
+                            <h3>🎨 색상 스트룹</h3>
+                            <p>글자가 아닌<br>색깔을 골라야 해요!</p>
                         </div>
                     </div>
                 </div>
@@ -1841,6 +1916,13 @@
             document.getElementById('game1FailCount').textContent = '0';
             document.getElementById('game1FailWrap').style.display = 'block';
             document.getElementById('taskProgressFill').style.width = '0%';
+            // clickArea 초기화 (이전 게임 잔상 제거)
+            const _ca = document.getElementById('clickArea');
+            _ca.innerHTML = '';
+            _ca.style.background = '';
+            _ca.style.padding = '';
+            _ca.style.cursor = '';
+            _ca.onclick = null;
 
             if (taskType === 'simple') {
                 startSimpleTask();
@@ -1849,160 +1931,178 @@
             }
         }
 
-        // 단순 작업 - 1초 리듬 게임
+        // 단순 작업 - 두더지 잡기
         function startSimpleTask() {
             let timeLeft = 30;
             let score = 0;
             let fails = 0;
-            let currentSegment = 0;
-            let canClick = false;
             let isFinished = false;
-            const totalSegments = 30;
             const clickTimes = [];
+            const TOTAL_HOLES = 9;
+            const moleTimers = {}; // holeIdx -> timeoutId
 
-            document.getElementById('simpleProgress').style.display = 'block';
+            document.getElementById('simpleProgress').style.display = 'none';
             document.getElementById('complexProgress').style.display = 'none';
             document.getElementById('game1FailWrap').style.display = 'block';
 
-            const circleContainer = document.getElementById('circleContainer');
-            circleContainer.innerHTML = '';
-            for (let i = 0; i < totalSegments; i++) {
-                const segment = document.createElement('div');
-                segment.className = 'circle-segment';
-                segment.id = `segment-${i}`;
-                circleContainer.appendChild(segment);
-            }
-
             const clickArea = document.getElementById('clickArea');
-            clickArea.style.background = '#ccc';
-            clickArea.textContent = '준비 중...';
+            // clickArea 스타일 초기화 후 그리드로 교체
+            clickArea.style.background = 'transparent';
+            clickArea.style.padding = '10px 0';
+            clickArea.style.cursor = 'default';
             clickArea.onclick = null;
 
-            function finishSimpleTask() {
+            // 그리드 생성
+            const grid = document.createElement('div');
+            grid.className = 'mole-grid';
+            grid.id = 'moleGrid';
+            for (let i = 0; i < TOTAL_HOLES; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'mole-hole';
+                hole.id = `hole-${i}`;
+                const moleSpan = document.createElement('span');
+                moleSpan.className = 'mole';
+                moleSpan.textContent = '🐹';
+                hole.appendChild(moleSpan);
+                hole.addEventListener('click', () => whackMole(i));
+                grid.appendChild(hole);
+            }
+            clickArea.innerHTML = '';
+            clickArea.appendChild(grid);
+
+            function finishMoleTask() {
                 if (isFinished) return;
                 isFinished = true;
-                canClick = false;
-                clickArea.onclick = null;
-                clickArea.style.background = '#e9ecef';
-                clickArea.textContent = '테스트 완료! 아래 다음 버튼을 눌러주세요.';
+                // 모든 두더지 타이머 제거
+                Object.values(moleTimers).forEach(t => clearTimeout(t));
+                // 모든 구멍 비활성화
+                for (let i = 0; i < TOTAL_HOLES; i++) {
+                    const h = document.getElementById(`hole-${i}`);
+                    if (h) {
+                        h.classList.remove('active');
+                        h.style.pointerEvents = 'none';
+                    }
+                }
                 gameData.game1.score = score;
                 gameData.game1.fails = fails;
                 gameData.game1.consistency = clickTimes;
                 document.getElementById('game1Footer').style.display = 'flex';
             }
 
-            function runSimpleTask() {
-                let segmentTimer = setInterval(() => {
-                    if (currentSegment >= totalSegments) {
-                        clearInterval(segmentTimer);
-                        return;
-                    }
+            function showMole(holeIdx) {
+                if (isFinished) return;
+                const hole = document.getElementById(`hole-${holeIdx}`);
+                if (!hole || hole.classList.contains('active')) return;
 
-                    if (currentSegment > 0) {
-                        const prev = document.getElementById(`segment-${currentSegment - 1}`);
-                        if (!prev.classList.contains('failed')) {
-                            prev.classList.remove('active');
-                        }
-                    }
+                hole.classList.add('active');
+                const stayTime = 600 + Math.random() * 400; // 0.6~1.0초
 
-                    const current = document.getElementById(`segment-${currentSegment}`);
-                    current.classList.add('active');
-                    canClick = true;
-
-                    clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    clickArea.textContent = '지금 클릭!';
-
-                    setTimeout(() => {
-                        if (isFinished) return;
-                        if (canClick) {
-                            fails++;
-                            document.getElementById('game1FailCount').textContent = fails;
-                            current.classList.remove('active');
-                            current.classList.add('failed');
-                            canClick = false;
-                            clickArea.style.background = '#ccc';
-                            clickArea.textContent = '놓쳤어요!';
-                        }
-                    }, 800);
-
-                    currentSegment++;
-                }, 1000);
-
-                clickArea.onclick = function() {
+                moleTimers[holeIdx] = setTimeout(() => {
                     if (isFinished) return;
-                    if (canClick) {
-                        score++;
-                        clickTimes.push(Date.now());
-                        document.getElementById('taskScore').textContent = score;
-                        canClick = false;
-                        clickArea.style.background = '#51cf66';
-                        clickArea.textContent = '성공!';
-
-                        setTimeout(() => {
-                            if (isFinished) return;
-                            clickArea.style.background = '#ccc';
-                            clickArea.textContent = '다음 타이밍을 기다리세요...';
-                        }, 200);
+                    if (hole.classList.contains('active')) {
+                        // 놓침
+                        fails++;
+                        document.getElementById('game1FailCount').textContent = fails;
+                        hole.classList.remove('active');
                     }
-                };
-
-                const timer = setInterval(() => {
-                    timeLeft--;
-                    document.getElementById('game1Timer').textContent = timeLeft;
-
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        clearInterval(segmentTimer);
-                        finishSimpleTask();
-                    }
-                }, 1000);
+                    delete moleTimers[holeIdx];
+                }, stayTime);
             }
 
-            let countdown = 3;
+            function whackMole(holeIdx) {
+                if (isFinished) return;
+                const hole = document.getElementById(`hole-${holeIdx}`);
+                if (!hole || !hole.classList.contains('active')) return;
+
+                // 성공
+                clearTimeout(moleTimers[holeIdx]);
+                delete moleTimers[holeIdx];
+                score++;
+                clickTimes.push(Date.now());
+                document.getElementById('taskScore').textContent = score;
+
+                // 💥 애니메이션
+                hole.classList.remove('active');
+                hole.classList.add('hit');
+                const moleSpan = hole.querySelector('.mole');
+                moleSpan.textContent = '💥';
+                setTimeout(() => {
+                    hole.classList.remove('hit');
+                    moleSpan.textContent = '🐹';
+                }, 350);
+            }
+
+            // 두더지 스폰 루프
+            let spawnInterval;
+            function startSpawning() {
+                function spawnOne() {
+                    if (isFinished) return;
+                    // 15초 지점부터 동시 2마리
+                    const count = timeLeft <= 15 ? 2 : 1;
+                    const shuffled = Array.from({length: TOTAL_HOLES}, (_, i) => i)
+                        .sort(() => Math.random() - 0.5);
+                    let spawned = 0;
+                    for (let i = 0; i < shuffled.length && spawned < count; i++) {
+                        const h = document.getElementById(`hole-${shuffled[i]}`);
+                        if (h && !h.classList.contains('active')) {
+                            showMole(shuffled[i]);
+                            spawned++;
+                        }
+                    }
+                }
+                spawnInterval = setInterval(spawnOne, 800);
+                spawnOne(); // 즉시 첫 두더지 등장
+            }
+
+            // 타이머
             document.getElementById('game1Timer').textContent = '30';
-            clickArea.textContent = `시작까지 ${countdown}`;
-            const countdownTimer = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    clickArea.textContent = `시작까지 ${countdown}`;
-                } else if (countdown === 0) {
-                    clickArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    clickArea.textContent = '시작!';
-                } else {
-                    clearInterval(countdownTimer);
-                    clickArea.style.background = '#ccc';
-                    runSimpleTask();
+            const mainTimer = setInterval(() => {
+                if (isFinished) { clearInterval(mainTimer); return; }
+                timeLeft--;
+                document.getElementById('game1Timer').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(mainTimer);
+                    clearInterval(spawnInterval);
+                    finishMoleTask();
                 }
             }, 1000);
+
+            startSpawning();
         }
 
-        // 복잡 작업 - 개선된 패턴 매칭
+        // 복잡 작업 - 색상 스트룹 테스트
         function startComplexTask() {
             let timeLeft = 30;
             let score = 0;
             let fails = 0;
             let isFinished = false;
-            const patterns = [
-                { emoji: '🔴', color: '#ff6b6b', name: '빨강', brightness: 1 },
-                { emoji: '🔵', color: '#4dabf7', name: '파랑', brightness: 2 },
-                { emoji: '🟢', color: '#51cf66', name: '초록', brightness: 3 },
-                { emoji: '🟡', color: '#ffd43b', name: '노랑', brightness: 4 }
+            const clickTimes = [];
+
+            const stroopColors = [
+                { name: '빨강', color: '#ff4757', label: '🔴 빨강' },
+                { name: '파랑', color: '#2e86de', label: '🔵 파랑' },
+                { name: '초록', color: '#1dd1a1', label: '🟢 초록' },
+                { name: '노랑', color: '#ffd32a', label: '🟡 노랑' }
             ];
 
-            const operations = ['같은 것', '다른 것'];
-            let currentPattern = null;
-            let currentOperation = null;
-            const clickTimes = [];
+            let currentWordIdx = 0;   // 글자로 표시되는 색 이름의 인덱스
+            let currentColorIdx = 0;  // 실제 글자 색의 인덱스 (정답)
+            let canAnswer = true;
 
             document.getElementById('simpleProgress').style.display = 'none';
             document.getElementById('complexProgress').style.display = 'block';
             document.getElementById('game1FailWrap').style.display = 'block';
 
             const clickArea = document.getElementById('clickArea');
+            clickArea.style.background = 'transparent';
+            clickArea.style.padding = '10px 0';
+            clickArea.style.cursor = 'default';
+            clickArea.onclick = null;
 
-            function finishComplexTask() {
+            function finishStroopTask() {
+                if (isFinished) return;
                 isFinished = true;
-                clickArea.innerHTML = '테스트 완료! 아래 다음 버튼을 눌러주세요.';
+                clickArea.innerHTML = '<p style="font-size:1.2em; color:#333; padding:20px;">테스트 완료! 아래 다음 버튼을 눌러주세요.</p>';
                 clickArea.style.background = '#e9ecef';
                 gameData.game1.score = score;
                 gameData.game1.fails = fails;
@@ -2010,81 +2110,86 @@
                 document.getElementById('game1Footer').style.display = 'flex';
             }
 
-            function generateNewQuestion() {
+            function generateStroopQuestion() {
                 if (isFinished) return;
+                canAnswer = true;
 
-                currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
-                currentOperation = operations[Math.floor(Math.random() * operations.length)];
+                // 일치(congruent) 40% / 불일치(incongruent) 60%
+                const isCongruent = Math.random() < 0.4;
+                currentColorIdx = Math.floor(Math.random() * stroopColors.length);
+                if (isCongruent) {
+                    currentWordIdx = currentColorIdx;
+                } else {
+                    let wordIdx;
+                    do {
+                        wordIdx = Math.floor(Math.random() * stroopColors.length);
+                    } while (wordIdx === currentColorIdx);
+                    currentWordIdx = wordIdx;
+                }
+
+                const wordName = stroopColors[currentWordIdx].name;
+                const inkColor = stroopColors[currentColorIdx].color;
+
+                // 버튼 순서 셔플
+                const shuffledColors = [...stroopColors]
+                    .map((c, i) => ({ ...c, origIdx: i }))
+                    .sort(() => Math.random() - 0.5);
 
                 clickArea.innerHTML = `
-                    <div style="font-size: 2em; margin-bottom: 20px;">${currentPattern.emoji}</div>
-                    <div style="font-size: 1.3em; margin-bottom: 20px;">${currentOperation}을 클릭!</div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                        ${patterns.map((p, idx) => `
-                            <button 
-                                id="option-${idx}"
-                                style="padding: 30px; font-size: 2em; border: 3px solid white; border-radius: 12px; cursor: pointer; background: ${p.color}; transition: all 0.2s;"
-                                onmouseover="this.style.transform='scale(1.1)'"
-                                onmouseout="this.style.transform='scale(1)'"
-                                onclick="checkComplexAnswer(${idx})"
-                            >
-                                ${p.emoji}
+                    <p style="font-size:0.95em; color:#999; margin-bottom:4px;">글자의 <strong style="color:#333;">색깔</strong>을 선택하세요</p>
+                    <div class="stroop-word" style="color:${inkColor};">${wordName}</div>
+                    <div class="stroop-btn-grid" id="stroopBtnGrid">
+                        ${shuffledColors.map(c => `
+                            <button class="stroop-btn" id="stroop-${c.origIdx}"
+                                onclick="checkStroopAnswer(${c.origIdx})">
+                                ${c.label}
                             </button>
                         `).join('')}
                     </div>
                 `;
             }
 
-            generateNewQuestion();
+            window.checkStroopAnswer = function(selectedIdx) {
+                if (isFinished || !canAnswer) return;
+                canAnswer = false;
 
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('game1Timer').textContent = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    finishComplexTask();
-                }
-            }, 1000);
-
-            window.checkComplexAnswer = function(selectedIdx) {
-                if (isFinished) return;
-
-                let isCorrect = false;
-                const selected = patterns[selectedIdx];
-
-                if (currentOperation === '같은 것') {
-                    isCorrect = (selected.emoji === currentPattern.emoji);
-                } else if (currentOperation === '다른 것') {
-                    isCorrect = (selected.emoji !== currentPattern.emoji);
-                }
+                const isCorrect = (selectedIdx === currentColorIdx);
+                const btn = document.getElementById(`stroop-${selectedIdx}`);
 
                 if (isCorrect) {
                     score++;
                     clickTimes.push(Date.now());
                     document.getElementById('taskScore').textContent = score;
-
-                    const btn = document.getElementById(`option-${selectedIdx}`);
-                    btn.style.border = '5px solid #51cf66';
-                    setTimeout(() => {
-                        if (isFinished) return;
-                        btn.style.border = '3px solid white';
-                        generateNewQuestion();
-                    }, 300);
-
                     const progress = Math.min((score / 20) * 100, 100);
                     document.getElementById('taskProgressFill').style.width = progress + '%';
+                    if (btn) btn.classList.add('correct');
+                    setTimeout(() => {
+                        if (!isFinished) generateStroopQuestion();
+                    }, 300);
                 } else {
                     fails++;
                     document.getElementById('game1FailCount').textContent = fails;
-                    const btn = document.getElementById(`option-${selectedIdx}`);
-                    btn.style.border = '5px solid #ff6b6b';
+                    if (btn) btn.classList.add('wrong');
+                    // 정답 버튼도 하이라이트
+                    const correctBtn = document.getElementById(`stroop-${currentColorIdx}`);
+                    if (correctBtn) correctBtn.classList.add('correct');
                     setTimeout(() => {
-                        if (isFinished) return;
-                        btn.style.border = '3px solid white';
-                    }, 300);
+                        if (!isFinished) generateStroopQuestion();
+                    }, 500);
                 }
             };
+
+            generateStroopQuestion();
+
+            const timer = setInterval(() => {
+                if (isFinished) { clearInterval(timer); return; }
+                timeLeft--;
+                document.getElementById('game1Timer').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    finishStroopTask();
+                }
+            }, 1000);
         }
 
         // 설문 시작
