@@ -1403,12 +1403,7 @@
                     </div>
                     <div class="step">
                         <div class="step-number">4</div>
-                        <strong>성향 설문</strong>
-                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">2분</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">5</div>
-                        <strong>2주 여행 시뮬레이션</strong>
+                        <strong>2주 시뮬레이션</strong>
                         <p style="margin-top: 10px; font-size: 0.9em; color: #666;">5분</p>
                     </div>
                 </div>
@@ -1464,18 +1459,18 @@
                         클릭하세요!
                     </div>
                     <div class="priority-footer" id="game1Footer" style="display:none; margin-top: 18px;">
-                        <button class="btn btn-primary" id="game1NextBtn" onclick="startSurvey1()">다음으로 →</button>
+                        <button class="btn btn-primary" id="game1NextBtn" onclick="startSurvey()">다음으로 →</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 설문 1 -->
-        <div class="screen" id="survey1Screen">
+        <!-- 설문 -->
+        <div class="screen" id="surveyScreen">
             <div class="card survey-screen">
-                <div class="progress-indicator" id="survey1Progress"></div>
-                <div class="question-text" id="survey1Question"></div>
-                <div class="survey-options" id="survey1Options"></div>
+                <div class="progress-indicator" id="surveyProgress"></div>
+                <div class="question-text" id="surveyQuestion"></div>
+                <div class="survey-options" id="surveyOptions"></div>
             </div>
         </div>
 
@@ -1503,15 +1498,6 @@
                 <div class="priority-footer">
                     <button class="btn btn-primary" id="priorityNextBtn" style="display:none; max-width:320px;" disabled onclick="submitPriorities()">다음으로 →</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- 설문 2 -->
-        <div class="screen" id="survey2Screen">
-            <div class="card survey-screen">
-                <div class="progress-indicator" id="survey2Progress"></div>
-                <div class="question-text" id="survey2Question"></div>
-                <div class="survey-options" id="survey2Options"></div>
             </div>
         </div>
 
@@ -1594,14 +1580,12 @@
         // 전역 데이터
         const gameData = {
             game1: { taskType: '', score: 0, fails: 0, startTime: 0, consistency: [] },
-            survey1: [],
+            survey: [],
             game2: { priorities: [], changes: 0, timeSpent: 0 },
-            survey2: [],
             game3: { days: [], avgReactionTime: 0, patterns: {} }
         };
 
-        let currentSurvey1 = 0;
-        let currentSurvey2 = 0;
+        let currentSurvey = 0;
         let currentDay = 0;
 
         const typeCharacterAssets = {
@@ -1687,8 +1671,9 @@
             `;
         }
 
-        // 설문 데이터
-        const survey1Questions = [
+        // 설문 데이터 (통합 8문항)
+        const surveyQuestions = [
+            // 구조 축 (2문항)
             {
                 text: '계획을 세울 때 나는...',
                 options: [
@@ -1697,6 +1682,14 @@
                 ]
             },
             {
+                text: '장기 프로젝트를 할 때...',
+                options: [
+                    { text: '일정을 만들고 철저히 관리한다', value: 'schedule' },
+                    { text: '큰 흐름만 정하고 유연하게 조정한다', value: 'adaptive' }
+                ]
+            },
+            // 시작 축 (2문항)
+            {
                 text: '새로운 일을 시작할 때...',
                 options: [
                     { text: '충분히 준비한 후 시작한다', value: 'prepared' },
@@ -1704,10 +1697,18 @@
                 ]
             },
             {
-                text: '집중력이 떨어질 때 나는...',
+                text: '실패했을 때 나는...',
                 options: [
-                    { text: '휴식을 취한 후 다시 시작한다', value: 'rest' },
-                    { text: '억지로라도 계속 진행한다', value: 'push' }
+                    { text: '원인을 분석하고 전략을 수정한다', value: 'analyze' },
+                    { text: '빠르게 다시 도전한다', value: 'retry' }
+                ]
+            },
+            // 압박 축 (2문항)
+            {
+                text: '압박 상황에서 나는...',
+                options: [
+                    { text: '오히려 집중력이 높아진다', value: 'thrive' },
+                    { text: '평소보다 실수가 늘어난다', value: 'stress' }
                 ]
             },
             {
@@ -1717,37 +1718,7 @@
                     { text: '단기간에 집중해서 끝낸다', value: 'sprint' }
                 ]
             },
-            {
-                text: '실패했을 때 나는...',
-                options: [
-                    { text: '원인을 분석하고 전략을 수정한다', value: 'analyze' },
-                    { text: '빠르게 다시 도전한다', value: 'retry' }
-                ]
-            }
-        ];
-
-        const survey2Questions = [
-            {
-                text: '협업할 때 선호하는 방식은...',
-                options: [
-                    { text: '역할을 명확히 나누고 진행한다', value: 'structured' },
-                    { text: '유기적으로 협력하며 진행한다', value: 'organic' }
-                ]
-            },
-            {
-                text: '피드백을 받을 때...',
-                options: [
-                    { text: '구체적이고 명확한 피드백을 선호한다', value: 'specific' },
-                    { text: '전반적인 방향성 피드백을 선호한다', value: 'general' }
-                ]
-            },
-            {
-                text: '압박 상황에서 나는...',
-                options: [
-                    { text: '오히려 집중력이 높아진다', value: 'thrive' },
-                    { text: '평소보다 실수가 늘어난다', value: 'stress' }
-                ]
-            },
+            // 집중/동기 축 (1문항)
             {
                 text: '학습할 때 선호하는 방식은...',
                 options: [
@@ -1755,11 +1726,12 @@
                     { text: '관심 가는 것을 자유롭게 탐구한다', value: 'explore' }
                 ]
             },
+            // 보완 문항 (1문항)
             {
-                text: '장기 프로젝트를 할 때...',
+                text: '집중력이 떨어질 때 나는...',
                 options: [
-                    { text: '일정을 만들고 철저히 관리한다', value: 'schedule' },
-                    { text: '큰 흐름만 정하고 유연하게 조정한다', value: 'adaptive' }
+                    { text: '휴식을 취한 후 다시 시작한다', value: 'rest' },
+                    { text: '억지로라도 계속 진행한다', value: 'push' }
                 ]
             }
         ];
@@ -2115,38 +2087,38 @@
             };
         }
 
-        // 설문 1 시작
-        function startSurvey1() {
-            currentSurvey1 = 0;
-            showScreen('survey1Screen');
-            showSurvey1Question();
+        // 설문 시작
+        function startSurvey() {
+            currentSurvey = 0;
+            showScreen('surveyScreen');
+            showSurveyQuestion();
         }
 
-        function showSurvey1Question() {
-            const q = survey1Questions[currentSurvey1];
-            document.getElementById('survey1Progress').textContent = 
-                `설문 ${currentSurvey1 + 1} / ${survey1Questions.length}`;
-            document.getElementById('survey1Question').textContent = q.text;
-            
+        function showSurveyQuestion() {
+            const q = surveyQuestions[currentSurvey];
+            document.getElementById('surveyProgress').textContent =
+                `설문 ${currentSurvey + 1} / ${surveyQuestions.length}`;
+            document.getElementById('surveyQuestion').textContent = q.text;
+
             const optionsHtml = q.options.map((opt, idx) => `
-                <div class="survey-option" onclick="answerSurvey1(${idx})">
+                <div class="survey-option" onclick="answerSurvey(${idx})">
                     ${opt.text}
                 </div>
             `).join('');
-            
-            document.getElementById('survey1Options').innerHTML = optionsHtml;
+
+            document.getElementById('surveyOptions').innerHTML = optionsHtml;
         }
 
-        function answerSurvey1(optionIndex) {
-            const q = survey1Questions[currentSurvey1];
-            gameData.survey1.push({
+        function answerSurvey(optionIndex) {
+            const q = surveyQuestions[currentSurvey];
+            gameData.survey.push({
                 question: q.text,
                 answer: q.options[optionIndex].value
             });
-            
-            currentSurvey1++;
-            if (currentSurvey1 < survey1Questions.length) {
-                setTimeout(() => showSurvey1Question(), 300);
+
+            currentSurvey++;
+            if (currentSurvey < surveyQuestions.length) {
+                setTimeout(() => showSurveyQuestion(), 300);
             } else {
                 setTimeout(() => startGame2(), 500);
             }
@@ -2270,49 +2242,12 @@
                 clearInterval(timer);
                 gameData.game2.timeSpent = Date.now() - startTime;
                 gameData.game2.priorities = [...selectedOrder];
-                setTimeout(() => startSurvey2(), 300);
+                setTimeout(() => startGame3(), 300);
             };
 
             updatePriorityUI();
         }
 
-
-        // 설문 2
-        function startSurvey2() {
-            currentSurvey2 = 0;
-            showScreen('survey2Screen');
-            showSurvey2Question();
-        }
-
-        function showSurvey2Question() {
-            const q = survey2Questions[currentSurvey2];
-            document.getElementById('survey2Progress').textContent = 
-                `설문 ${currentSurvey2 + 1} / ${survey2Questions.length}`;
-            document.getElementById('survey2Question').textContent = q.text;
-            
-            const optionsHtml = q.options.map((opt, idx) => `
-                <div class="survey-option" onclick="answerSurvey2(${idx})">
-                    ${opt.text}
-                </div>
-            `).join('');
-            
-            document.getElementById('survey2Options').innerHTML = optionsHtml;
-        }
-
-        function answerSurvey2(optionIndex) {
-            const q = survey2Questions[currentSurvey2];
-            gameData.survey2.push({
-                question: q.text,
-                answer: q.options[optionIndex].value
-            });
-            
-            currentSurvey2++;
-            if (currentSurvey2 < survey2Questions.length) {
-                setTimeout(() => showSurvey2Question(), 300);
-            } else {
-                setTimeout(() => startGame3(), 500);
-            }
-        }
 
         // 게임 3: 2주 시뮬레이션
         function startGame3() {
@@ -2457,7 +2392,7 @@
         }
 
         function analyzeSurveys() {
-            const answers = [...gameData.survey1, ...gameData.survey2].map(item => item.answer);
+            const answers = [...gameData.survey].map(item => item.answer);
             const countMatches = (values) => answers.filter(answer => values.includes(answer)).length;
 
             const structuredScore = countMatches(['detail', 'prepared', 'steady', 'analyze', 'structured', 'specific', 'curriculum', 'schedule']);
